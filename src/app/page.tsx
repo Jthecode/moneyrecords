@@ -25,19 +25,35 @@ export default function Home() {
       {/* Page */}
       <main id="top">
         {/* HERO */}
-        <section aria-label="Money Records hero">
+        <section aria-label="Money Records hero" className="pt-2 md:pt-4">
           <Container>
-            <Hero />
+            <Hero
+              // ✅ route-based link (real page) instead of #services
+              primaryCtaHref="/services"
+              primaryCtaLabel="View Services"
+              // keep secondary as an on-page anchor if you want
+              secondaryCtaHref="#rank"
+              secondaryCtaLabel="See Ranking"
+            />
           </Container>
         </section>
 
         {/* WHY CHOOSE (Services) */}
-        <section id="services" aria-label="Services" className="mt-12">
-          <WhyChoose />
+        {/* Keep this section on the homepage as a preview (not the full services page). */}
+        <section
+          id="services"
+          aria-label="Services preview"
+          className="mt-12 scroll-mt-24"
+        >
+          <WhyChoose
+            // ✅ make CTA go to services route
+            ctaHref="/services"
+            ctaLabel="Explore Services"
+          />
         </section>
 
         {/* TOP 2% (Rank Badge Section) */}
-        <section id="rank" aria-label="Ranked" className="mt-12">
+        <section id="rank" aria-label="Ranked" className="mt-12 scroll-mt-24">
           <TopRank />
         </section>
 
@@ -59,7 +75,8 @@ export default function Home() {
                     Back to top
                   </a>
                   <span className="text-white/20">•</span>
-                  <a className="mr-navlink" href="#services">
+                  {/* ✅ route instead of #services */}
+                  <a className="mr-navlink" href="/services">
                     Services
                   </a>
                   <span className="text-white/20">•</span>
