@@ -1,73 +1,139 @@
 // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-/* ┃ Money Records — Services Page                                         ┃
+/* ┃ Money Records — Marketing Services Page                               ┃
    ┃ File   : src/app/services/page.tsx                                    ┃
-   ┃ Role   : Services landing (platforms + packages + CTA)                ┃
-   ┃ Status : Ready                                                       ┃
-   ┃ License: Proprietary                                                 ┃ */
+   ┃ Role   : Main platform-marketing storefront page                      ┃
+   ┃ Status : Production Ready                                             ┃
+   ┃ License: Proprietary — Money Records LLC                              ┃ */
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-import NavBar from "@/components/NavBar";
-import ServicesHero from "@/sections/ServicesHero";
-import ServicesPlatforms from "@/sections/ServicesPlatforms";
-import ServicesPackages from "@/sections/ServicesPackages";
-import ServicesFAQ from "@/sections/ServicesFAQ";
+import type { Metadata } from "next";
+
+import Container from "@/components/Container";
+
 import ServicesCTA from "@/sections/ServicesCTA";
+import ServicesFAQ from "@/sections/ServicesFAQ";
+import ServicesHero from "@/sections/ServicesHero";
+import ServicesHowItWorks from "@/sections/ServicesHowItWorks";
+import ServicesPlatforms from "@/sections/ServicesPlatforms";
+
+/* --------------------------------------------------------------------- */
+/* Metadata                                                               */
+/* --------------------------------------------------------------------- */
+
+export const metadata: Metadata = {
+  title: "Music Marketing Services",
+  description:
+    "Explore individual Money Records marketing services for Spotify, Apple Music, Instagram, TikTok, YouTube, VEVO, Press and PR, radio, SoundCloud, and artist branding.",
+
+  alternates: {
+    canonical: "/services",
+  },
+
+  openGraph: {
+    type: "website",
+    url: "/services",
+    title: "Music Marketing Services | Money Records",
+    description:
+      "Choose a platform and explore individual campaign options, pricing, deliverables, timing, requirements, and campaign standards.",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Music Marketing Services | Money Records",
+    description:
+      "Explore individual platform-marketing services and Spotify campaign options from Money Records.",
+  },
+};
+
+/* --------------------------------------------------------------------- */
+/* Services Page                                                          */
+/* --------------------------------------------------------------------- */
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen">
-      <NavBar />
+    <div
+      id="top"
+      className="mr-page overflow-hidden"
+    >
+      {/* --------------------------------------------------------------- */}
+      {/* Services Hero                                                   */}
+      {/* --------------------------------------------------------------- */}
 
-      <main className="mr-container">
-        <ServicesHero />
+      <div className="scroll-mt-28 pt-2 md:pt-4">
+        <Container size="wide">
+          <ServicesHero
+            eyebrow="Money Records Platform Marketing"
+            title={
+              <>
+                Choose Your Platform.{" "}
+                <span className="mr-text-gradient">
+                  Select Your Campaign.
+                </span>
+              </>
+            }
+            subtitle="Explore individual marketing services for Spotify, Apple Music, Instagram, TikTok, YouTube, VEVO, Press and PR, radio, SoundCloud, and artist branding. Each platform has its own status, pricing, deliverables, requirements, and campaign details."
+            primaryCtaHref="#platforms"
+            primaryCtaLabel="Explore Platforms"
+            secondaryCtaHref="#how-it-works"
+            secondaryCtaLabel="How It Works"
+          />
+        </Container>
+      </div>
 
-        <section id="platforms" className="mt-12">
-          <ServicesPlatforms />
-        </section>
+      {/* --------------------------------------------------------------- */}
+      {/* Platform Storefront                                             */}
+      {/* --------------------------------------------------------------- */}
 
-        <section id="packages" className="mt-12">
-          <ServicesPackages />
-        </section>
+      <ServicesPlatforms
+        id="platforms"
+        consultationHref="#contact"
+        consultationLabel="Ask About a Platform"
+        spotifyHref="/services/spotify"
+        spotifyLabel="View Spotify Campaigns"
+      />
 
-        <section id="faq" className="mt-12">
-          <ServicesFAQ />
-        </section>
+      {/* --------------------------------------------------------------- */}
+      {/* Storefront Process                                              */}
+      {/* --------------------------------------------------------------- */}
 
-        <ServicesCTA />
+      <ServicesHowItWorks
+        id="how-it-works"
+        primaryCtaHref="/services/spotify"
+        primaryCtaLabel="Explore Spotify Campaigns"
+        secondaryCtaHref="#contact"
+        secondaryCtaLabel="Ask About a Service"
+      />
 
-        <footer className="mt-16 pb-16">
-          <div className="mr-card p-6 md:p-7">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="text-xs tracking-[0.20em] uppercase text-[rgba(244,241,234,0.65)]">
-                © {new Date().getFullYear()} Money Records LLC. All rights
-                reserved.
-              </div>
+      {/* --------------------------------------------------------------- */}
+      {/* Frequently Asked Questions                                      */}
+      {/* --------------------------------------------------------------- */}
 
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                <a className="mr-navlink" href="/#top">
-                  Home
-                </a>
-                <span className="text-white/20">•</span>
-                <a className="mr-navlink" href="#platforms">
-                  Platforms
-                </a>
-                <span className="text-white/20">•</span>
-                <a className="mr-navlink" href="#packages">
-                  Packages
-                </a>
-                <span className="text-white/20">•</span>
-                <a className="mr-navlink" href="#faq">
-                  FAQ
-                </a>
-                <span className="text-white/20">•</span>
-                <a className="mr-navlink" href="#contact">
-                  Contact
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </main>
+      <ServicesFAQ
+        id="faq"
+        contactHref="#contact"
+        contactLabel="Ask Money Records"
+        platformsHref="#platforms"
+        platformsLabel="Explore All Platforms"
+        spotifyHref="/services/spotify"
+        spotifyLabel="View Spotify Campaigns"
+      />
+
+      {/* --------------------------------------------------------------- */}
+      {/* Final Conversion Section                                       */}
+      {/* --------------------------------------------------------------- */}
+
+      <ServicesCTA
+        id="contact"
+        primaryHref="/services/spotify"
+        primaryLabel="Explore Spotify Campaigns"
+        platformsHref="#platforms"
+        platformsLabel="View All Platforms"
+        email="info@moneyrecords.io"
+        instagramHref="https://instagram.com/kingpharaohreal"
+        instagramHandle="@kingpharaohreal"
+        submissionHref="mailto:info@moneyrecords.io?subject=Money%20Records%20Artist%20Submission"
+        submissionLabel="Submit Music to the Label"
+      />
     </div>
   );
 }
