@@ -14,7 +14,6 @@ import type {
 import AddToCartButton from "@/components/AddToCartButton";
 import Button from "@/components/Button";
 import Card from "@/components/Card";
-import Divider from "@/components/Divider";
 
 import {
   getCampaignPriceLabel,
@@ -35,104 +34,155 @@ export type CampaignCardProps = {
   /**
    * Campaign product rendered by the card.
    */
-  campaign: MarketingCampaign;
+  campaign:
+    MarketingCampaign;
 
   /**
    * Optional platform override.
    *
-   * The component normally resolves the platform automatically using
-   * campaign.platformSlug.
+   * Normally resolved automatically from campaign.platformSlug.
    */
-  platform?: MarketingPlatform;
+  platform?:
+    MarketingPlatform;
 
   /**
    * Optional campaign accent override.
    */
-  accent?: string;
+  accent?:
+    string;
 
   /**
    * Optional soft campaign accent override.
    */
-  accentSoft?: string;
+  accentSoft?:
+    string;
 
   /**
    * Displays the add-to-cart action.
    *
    * @default true
    */
-  showAddToCart?: boolean;
+  showAddToCart?:
+    boolean;
 
   /**
-   * Displays the compact campaign-standard disclaimer.
+   * Displays the campaign-standard disclaimer.
    *
    * @default true
    */
-  showDisclaimer?: boolean;
+  showDisclaimer?:
+    boolean;
 
   /**
-   * Displays up to this many deliverables.
+   * Maximum number of deliverables displayed.
+   *
+   * Mobile automatically hides deliverables beyond the first three.
    *
    * @default 4
    */
-  deliverableLimit?: number;
+  deliverableLimit?:
+    number;
+
+  /**
+   * Uses the shorter storefront / horizontal-scroller layout.
+   *
+   * @default false
+   */
+  compact?:
+    boolean;
 
   /**
    * Cart-page destination used when the campaign is already selected.
    *
    * @default "/cart"
    */
-  cartHref?: string;
+  cartHref?:
+    string;
 
   /**
    * Optional campaign-details destination override.
    */
-  detailsHref?: string;
+  detailsHref?:
+    string;
 
   /**
    * Optional add-to-cart label override.
    */
-  addToCartLabel?: string;
+  addToCartLabel?:
+    string;
 
   /**
    * Optional campaign-details label override.
    */
-  detailsLabel?: string;
+  detailsLabel?:
+    string;
 
   /**
    * Opens the global cart drawer after adding the campaign.
    *
    * @default true
    */
-  openCartOnAdd?: boolean;
+  openCartOnAdd?:
+    boolean;
 
   /**
-   * Displays add-to-cart feedback beneath the button.
+   * Displays AddToCartButton feedback beneath the button.
    *
    * @default false
    */
-  showCartMessage?: boolean;
+  showCartMessage?:
+    boolean;
 
   /**
-   * Makes the campaign card fill its parent height.
+   * Makes the card fill the available parent height.
    *
    * @default true
    */
-  fullHeight?: boolean;
+  fullHeight?:
+    boolean;
 
-  className?: string;
+  /**
+   * Optional additional wrapper classes.
+   */
+  className?:
+    string;
 };
 
-type CampaignStyle = CSSProperties & {
-  "--campaign-accent"?: string;
-  "--campaign-accent-soft"?: string;
-  "--campaign-border"?: string;
+type CampaignStyle =
+  CSSProperties & {
+    "--campaign-accent"?:
+      string;
+
+    "--campaign-accent-soft"?:
+      string;
+
+    "--campaign-border"?:
+      string;
+  };
+
+type CampaignMetricProps = {
+  icon:
+    ReactNode;
+
+  label:
+    string;
+
+  value:
+    string;
+
+  accent?:
+    boolean;
+
+  compact?:
+    boolean;
 };
 
 /* --------------------------------------------------------------------- */
 /* Icons                                                                  */
 /* --------------------------------------------------------------------- */
 
-function ArrowIcon() {
+function ArrowIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -152,7 +202,8 @@ function ArrowIcon() {
   );
 }
 
-function CartIcon() {
+function CartIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -188,7 +239,8 @@ function CartIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -208,7 +260,8 @@ function CheckIcon() {
   );
 }
 
-function ClockIcon() {
+function ClockIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -236,7 +289,8 @@ function ClockIcon() {
   );
 }
 
-function TargetIcon() {
+function TargetIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -271,7 +325,8 @@ function TargetIcon() {
   );
 }
 
-function ShieldIcon() {
+function ShieldIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -298,7 +353,8 @@ function ShieldIcon() {
   );
 }
 
-function LockIcon() {
+function LockIcon():
+  ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -332,23 +388,73 @@ function LockIcon() {
 /* --------------------------------------------------------------------- */
 
 function joinClasses(
-  ...classes: Array<string | false | null | undefined>
+  ...classes: Array<
+    string |
+    false |
+    null |
+    undefined
+  >
 ): string {
-  return classes.filter(Boolean).join(" ");
+  return classes
+    .filter(Boolean)
+    .join(" ");
+}
+
+function sanitizeDeliverableLimit(
+  value:
+    number,
+
+  compact:
+    boolean,
+): number {
+  if (
+    !Number.isFinite(
+      value,
+    )
+  ) {
+    return compact
+      ? 2
+      : 4;
+  }
+
+  const safeValue =
+    Math.max(
+      0,
+      Math.floor(
+        value,
+      ),
+    );
+
+  if (
+    compact
+  ) {
+    return Math.min(
+      safeValue,
+      2,
+    );
+  }
+
+  return safeValue;
 }
 
 function getCampaignStatusLabel(
-  status: CampaignStatus,
-  purchasable: boolean,
+  status:
+    CampaignStatus,
+
+  purchasable:
+    boolean,
 ): string {
   if (
-    status === "live" &&
+    status ===
+      "live" &&
     purchasable
   ) {
     return "Available";
   }
 
-  switch (status) {
+  switch (
+    status
+  ) {
     case "coming-soon":
       return "Coming Soon";
 
@@ -365,14 +471,18 @@ function getCampaignStatusLabel(
 }
 
 function getCampaignStatusClass(
-  campaign: MarketingCampaign,
+  campaign:
+    MarketingCampaign,
 ): string {
-  if (campaign.featured) {
+  if (
+    campaign.featured
+  ) {
     return "mr-badge mr-badge-featured";
   }
 
   if (
-    campaign.status === "live" &&
+    campaign.status ===
+      "live" &&
     campaign.purchasable
   ) {
     return "mr-badge mr-badge-success";
@@ -382,32 +492,222 @@ function getCampaignStatusClass(
 }
 
 /* --------------------------------------------------------------------- */
-/* Campaign Metric                                                        */
+/* Campaign Target Mark                                                   */
 /* --------------------------------------------------------------------- */
 
-type CampaignMetricProps = {
-  icon: ReactNode;
-  label: string;
-  value: string;
-};
+function CampaignTargetMark({
+  target,
+  compact,
+}: {
+  target:
+    string;
+
+  compact:
+    boolean;
+}) {
+  return (
+    <div
+      className={joinClasses(
+        "relative grid flex-[0_0_auto] place-items-center",
+        "overflow-hidden border",
+        "border-[var(--campaign-border)]",
+        "bg-[var(--campaign-accent-soft)]",
+        "shadow-[0_14px_40px_rgba(0,0,0,0.3)]",
+
+        compact
+          ? [
+              "h-12",
+              "min-w-12",
+              "rounded-[15px]",
+              "px-2",
+            ].join(" ")
+          : [
+              "h-14",
+              "min-w-14",
+              "rounded-[18px]",
+              "px-2.5",
+              "sm:h-16",
+              "sm:min-w-16",
+            ].join(" "),
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={[
+          "absolute inset-x-2 top-0 h-px",
+          "bg-[linear-gradient(90deg,transparent,var(--campaign-accent),transparent)]",
+          "opacity-70",
+        ].join(" ")}
+      />
+
+      <div className="relative text-center">
+        <p
+          className={joinClasses(
+            "m-0 font-black leading-none",
+            "tracking-[-0.04em]",
+            "text-[var(--campaign-accent)]",
+
+            compact
+              ? "text-sm"
+              : "text-base sm:text-lg",
+          )}
+        >
+          {target}
+        </p>
+
+        {!compact ? (
+          <p className="mt-1 text-[7px] font-black uppercase tracking-[0.1em] text-white/30">
+            Target
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Campaign Metric                                                        */
+/* --------------------------------------------------------------------- */
 
 function CampaignMetric({
   icon,
   label,
   value,
+  accent =
+    false,
+  compact =
+    false,
 }: CampaignMetricProps) {
   return (
-    <div className="rounded-2xl border border-white/[0.065] bg-white/[0.025] p-4">
-      <div className="flex items-center gap-2 text-[var(--campaign-accent)]">
+    <div
+      className={joinClasses(
+        "min-w-0 rounded-[16px] border",
+
+        compact
+          ? "px-3 py-2.5"
+          : "p-3 sm:p-3.5",
+
+        accent
+          ? [
+              "border-[var(--campaign-border)]",
+              "bg-[var(--campaign-accent-soft)]",
+            ].join(" ")
+          : [
+              "border-white/[0.06]",
+              "bg-white/[0.02]",
+            ].join(" "),
+      )}
+    >
+      <div
+        className={joinClasses(
+          "flex items-center gap-1.5",
+
+          accent
+            ? "text-[var(--campaign-accent)]"
+            : "text-white/30",
+        )}
+      >
         {icon}
 
-        <p className="m-0 text-[9px] font-black uppercase tracking-[0.14em] text-white/38">
+        <p className="m-0 truncate text-[7px] font-black uppercase tracking-[0.11em] text-white/28 sm:text-[8px]">
           {label}
         </p>
       </div>
 
-      <p className="mt-3 text-sm font-black leading-5 tracking-[-0.015em] text-[var(--mr-text)]">
+      <p
+        className={joinClasses(
+          "truncate font-black tracking-[-0.02em]",
+          "text-[var(--mr-text)]",
+
+          compact
+            ? "mt-1.5 text-xs"
+            : "mt-2 text-sm",
+        )}
+      >
         {value}
+      </p>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Deliverable                                                            */
+/* --------------------------------------------------------------------- */
+
+function CampaignDeliverable({
+  children,
+  hiddenOnMobile =
+    false,
+}: {
+  children:
+    ReactNode;
+
+  hiddenOnMobile?:
+    boolean;
+}) {
+  return (
+    <li
+      className={joinClasses(
+        "min-w-0 items-start gap-2.5",
+        "text-[11px] leading-5 text-white/46",
+        "sm:text-xs",
+
+        hiddenOnMobile
+          ? "hidden sm:flex"
+          : "flex",
+      )}
+    >
+      <span
+        className={[
+          "mt-0.5 grid h-[18px] w-[18px] flex-[0_0_18px]",
+          "place-items-center rounded-full",
+          "border border-[var(--campaign-border)]",
+          "bg-[var(--campaign-accent-soft)]",
+          "text-[var(--campaign-accent)]",
+        ].join(" ")}
+      >
+        <CheckIcon />
+      </span>
+
+      <span className="min-w-0">
+        {children}
+      </span>
+    </li>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Compact Disclaimer                                                     */
+/* --------------------------------------------------------------------- */
+
+function CampaignDisclaimer({
+  compact,
+}: {
+  compact:
+    boolean;
+}) {
+  return (
+    <div
+      className={joinClasses(
+        "border-t border-white/[0.05]",
+
+        compact
+          ? "mt-3 pt-3"
+          : "mt-4 pt-3.5",
+      )}
+    >
+      <p
+        className={joinClasses(
+          "m-0 text-white/27",
+
+          compact
+            ? "text-[8px] leading-4"
+            : "text-[9px] leading-4",
+        )}
+      >
+        Campaign targets are estimated promotional reach or
+        exposure—not guaranteed streams, followers, placements,
+        revenue, or results.
       </p>
     </div>
   );
@@ -419,26 +719,59 @@ function CampaignMetric({
 
 export default function CampaignCard({
   campaign,
-  platform: platformOverride,
+
+  platform:
+    platformOverride,
+
   accent,
+
   accentSoft,
-  showAddToCart = true,
-  showDisclaimer = true,
-  deliverableLimit = 4,
-  cartHref = "/cart",
+
+  showAddToCart =
+    true,
+
+  showDisclaimer =
+    true,
+
+  deliverableLimit =
+    4,
+
+  compact =
+    false,
+
+  cartHref =
+    "/cart",
+
   detailsHref,
+
   addToCartLabel,
+
   detailsLabel,
-  openCartOnAdd = true,
-  showCartMessage = false,
-  fullHeight = true,
+
+  openCartOnAdd =
+    true,
+
+  showCartMessage =
+    false,
+
+  fullHeight =
+    true,
+
   className,
 }: CampaignCardProps) {
+  /* ------------------------------------------------------------------- */
+  /* Platform                                                            */
+  /* ------------------------------------------------------------------- */
+
   const platform =
     platformOverride ??
     getPlatformBySlug(
       campaign.platformSlug,
     );
+
+  /* ------------------------------------------------------------------- */
+  /* Styling                                                             */
+  /* ------------------------------------------------------------------- */
 
   const resolvedAccent =
     accent ??
@@ -449,6 +782,22 @@ export default function CampaignCard({
     accentSoft ??
     platform?.accentSoft ??
     "rgba(214, 179, 90, 0.12)";
+
+  const campaignStyle:
+    CampaignStyle = {
+      "--campaign-accent":
+        resolvedAccent,
+
+      "--campaign-accent-soft":
+        resolvedAccentSoft,
+
+      "--campaign-border":
+        `color-mix(in srgb, ${resolvedAccent} 28%, transparent)`,
+    };
+
+  /* ------------------------------------------------------------------- */
+  /* Destinations / Labels                                               */
+  /* ------------------------------------------------------------------- */
 
   const resolvedDetailsHref =
     detailsHref ??
@@ -464,28 +813,22 @@ export default function CampaignCard({
     campaign.detailsLabel ??
     "View Campaign";
 
+  /* ------------------------------------------------------------------- */
+  /* State / Derived Data                                                */
+  /* ------------------------------------------------------------------- */
+
   const isPurchasable =
-    campaign.status === "live" &&
+    campaign.status ===
+      "live" &&
     campaign.purchasable;
-
-  const campaignStyle: CampaignStyle = {
-    "--campaign-accent":
-      resolvedAccent,
-
-    "--campaign-accent-soft":
-      resolvedAccentSoft,
-
-    "--campaign-border":
-      `color-mix(in srgb, ${resolvedAccent} 28%, transparent)`,
-  };
 
   const headingId =
     `${campaign.id}-campaign-heading`;
 
   const safeDeliverableLimit =
-    Math.max(
-      0,
-      Math.floor(deliverableLimit),
+    sanitizeDeliverableLimit(
+      deliverableLimit,
+      compact,
     );
 
   const displayedDeliverables =
@@ -501,6 +844,24 @@ export default function CampaignCard({
         displayedDeliverables.length,
     );
 
+  const priceLabel =
+    getCampaignPriceLabel(
+      campaign,
+    );
+
+  const statusLabel =
+    campaign.featured
+      ? campaign.badge ??
+        "Featured"
+      : getCampaignStatusLabel(
+          campaign.status,
+          campaign.purchasable,
+        );
+
+  /* ------------------------------------------------------------------- */
+  /* Render                                                              */
+  /* ------------------------------------------------------------------- */
+
   return (
     <Card
       as="article"
@@ -509,69 +870,126 @@ export default function CampaignCard({
           ? "featured"
           : "campaign"
       }
+      padding="none"
       hover
-      fullHeight={fullHeight}
-      topLine={campaign.featured}
+      fullHeight={
+        fullHeight
+      }
+      topLine={
+        campaign.featured
+      }
       className={joinClasses(
         "group relative overflow-hidden",
+
+        /*
+         * Avoid giant mobile cards while maintaining enough structure
+         * for equal-height service grids.
+         */
+        compact
+          ? [
+              "min-h-[390px]",
+              "sm:min-h-[410px]",
+            ].join(" ")
+          : [
+              "min-h-[470px]",
+              "sm:min-h-[500px]",
+              "lg:min-h-[520px]",
+            ].join(" "),
+
         className,
       )}
-      style={campaignStyle}
-      aria-labelledby={headingId}
+      style={
+        campaignStyle
+      }
+      aria-labelledby={
+        headingId
+      }
     >
-      {/* Campaign accent atmosphere */}
+      {/* --------------------------------------------------------------- */}
+      {/* Campaign Accent Atmosphere                                      */}
+      {/* --------------------------------------------------------------- */}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[var(--campaign-accent)] opacity-[0.07] blur-[90px] transition-opacity duration-300 group-hover:opacity-[0.14]"
+        className={[
+          "pointer-events-none absolute -right-20 -top-20",
+          "h-56 w-56 rounded-full",
+          "bg-[var(--campaign-accent)]",
+          "opacity-[0.055]",
+          "blur-[80px]",
+          "transition-opacity duration-300",
+          "group-hover:opacity-[0.11]",
+        ].join(" ")}
       />
+
+      {!compact ? (
+        <div
+          aria-hidden="true"
+          className={[
+            "pointer-events-none absolute -bottom-24 -left-20",
+            "h-52 w-52 rounded-full",
+            "bg-[var(--campaign-accent)]",
+            "opacity-[0.025]",
+            "blur-[85px]",
+          ].join(" ")}
+        />
+      ) : null}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-28 -left-24 h-64 w-64 rounded-full bg-[var(--campaign-accent)] opacity-[0.035] blur-[95px]"
+        className={[
+          "pointer-events-none absolute inset-x-8 top-0 h-px",
+          "bg-[linear-gradient(90deg,transparent,var(--campaign-accent),transparent)]",
+          campaign.featured
+            ? "opacity-75"
+            : "opacity-30",
+        ].join(" ")}
       />
 
-      <div className="relative flex h-full flex-col p-6 sm:p-7">
+      {/* --------------------------------------------------------------- */}
+      {/* Main Content                                                    */}
+      {/* --------------------------------------------------------------- */}
+
+      <div
+        className={joinClasses(
+          "relative flex h-full flex-col",
+
+          compact
+            ? "p-4 sm:p-5"
+            : "p-5 sm:p-6",
+        )}
+      >
         {/* ------------------------------------------------------------- */}
         {/* Header                                                        */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="flex items-start justify-between gap-5">
-          <div className="relative grid h-[72px] w-[72px] flex-[0_0_72px] place-items-center overflow-hidden rounded-[22px] border border-[var(--campaign-border)] bg-[var(--campaign-accent-soft)] shadow-[0_18px_48px_rgba(0,0,0,0.32)]">
+        <div className="flex items-start justify-between gap-3">
+          <CampaignTargetMark
+            target={
+              campaign.campaignTargetLabel
+            }
+            compact={
+              compact
+            }
+          />
+
+          <div className="flex min-w-0 flex-col items-end gap-1.5">
             <span
-              aria-hidden="true"
-              className="absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--campaign-accent),transparent)] opacity-70"
-            />
+              className={joinClasses(
+                getCampaignStatusClass(
+                  campaign,
+                ),
 
-            <div className="text-center">
-              <p className="m-0 text-xl font-black leading-none tracking-[-0.045em] text-[var(--campaign-accent)]">
-                {campaign.campaignTargetLabel}
-              </p>
-
-              <p className="mt-1 text-[8px] font-black uppercase tracking-[0.11em] text-white/38">
-                Campaign
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-2">
-            <span
-              className={getCampaignStatusClass(
-                campaign,
+                "max-w-[145px] truncate",
               )}
             >
-              {campaign.featured
-                ? campaign.badge ??
-                  "Featured"
-                : getCampaignStatusLabel(
-                    campaign.status,
-                    campaign.purchasable,
-                  )}
+              {statusLabel}
             </span>
 
-            {campaign.featured ? (
-              <span className="text-[9px] font-black uppercase tracking-[0.14em] text-white/30">
-                Most Popular Level
+            {campaign.featured &&
+            !compact ? (
+              <span className="text-[7px] font-black uppercase tracking-[0.12em] text-white/22 sm:text-[8px]">
+                Most Popular
               </span>
             ) : null}
           </div>
@@ -581,41 +999,95 @@ export default function CampaignCard({
         {/* Identity                                                      */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="mt-7">
-          <p className="m-0 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--campaign-accent)]">
+        <div
+          className={
+            compact
+              ? "mt-4"
+              : "mt-5"
+          }
+        >
+          <p className="m-0 text-[8px] font-black uppercase tracking-[0.16em] text-[var(--campaign-accent)] sm:text-[9px]">
             {campaign.eyebrow}
           </p>
 
           <h3
-            id={headingId}
-            className="mt-3 text-balance text-[1.65rem] font-black leading-[1.04] tracking-[-0.04em] text-[var(--mr-text)] transition-colors duration-200 group-hover:text-[var(--mr-gold-100)]"
+            id={
+              headingId
+            }
+            className={joinClasses(
+              "text-balance font-black leading-[1.06]",
+              "tracking-[-0.038em]",
+              "text-[var(--mr-text)]",
+              "transition-colors duration-200",
+              "group-hover:text-[var(--mr-gold-100)]",
+
+              compact
+                ? [
+                    "mt-2",
+                    "text-xl",
+                    "sm:text-[1.35rem]",
+                  ].join(" ")
+                : [
+                    "mt-2",
+                    "text-[1.4rem]",
+                    "sm:text-[1.55rem]",
+                  ].join(" "),
+            )}
           >
             {campaign.name}
           </h3>
 
-          <p className="mt-4 text-sm leading-7 text-white/50">
+          <p
+            className={joinClasses(
+              "mt-2.5 text-xs leading-5 text-white/43",
+              "sm:text-sm sm:leading-6",
+
+              compact
+                ? "line-clamp-2"
+                : "line-clamp-3",
+            )}
+          >
             {campaign.description}
           </p>
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* Campaign Metrics                                              */}
+        {/* Price + Metrics                                               */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div
+          className={joinClasses(
+            "grid gap-2",
+
+            compact
+              ? "mt-4 grid-cols-2"
+              : "mt-5 grid-cols-2",
+          )}
+        >
           <CampaignMetric
-            icon={<TargetIcon />}
-            label="Campaign Target"
+            icon={
+              <TargetIcon />
+            }
+            label="Target"
             value={
               campaign.campaignTargetLabel
+            }
+            accent
+            compact={
+              compact
             }
           />
 
           <CampaignMetric
-            icon={<ClockIcon />}
-            label="Estimated Duration"
+            icon={
+              <ClockIcon />
+            }
+            label="Duration"
             value={
               campaign.estimatedDuration
+            }
+            compact={
+              compact
             }
           />
         </div>
@@ -624,149 +1096,250 @@ export default function CampaignCard({
         {/* Promotional Reach Notice                                      */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="mt-4 rounded-2xl border border-[var(--campaign-border)] bg-[var(--campaign-accent-soft)] p-4">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 text-[var(--campaign-accent)]">
-              <ShieldIcon />
-            </span>
+        {!compact ? (
+          <div className="mt-3 rounded-[16px] border border-[var(--campaign-border)] bg-[var(--campaign-accent-soft)] px-3.5 py-3">
+            <div className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex-[0_0_auto] text-[var(--campaign-accent)]">
+                <ShieldIcon />
+              </span>
 
-            <div>
-              <p className="m-0 text-[9px] font-black uppercase tracking-[0.14em] text-white/38">
-                {campaign.metricLabel}
-              </p>
+              <div className="min-w-0">
+                <p className="m-0 text-[8px] font-black uppercase tracking-[0.12em] text-white/30">
+                  {campaign.metricLabel}
+                </p>
 
-              <p className="mt-2 text-xs leading-5 text-white/52">
-                {campaign.reachStatement}
-              </p>
+                <p className="mt-1.5 line-clamp-2 text-[10px] leading-5 text-white/43 sm:text-[11px]">
+                  {campaign.reachStatement}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
 
         {/* ------------------------------------------------------------- */}
         {/* Deliverables                                                  */}
         {/* ------------------------------------------------------------- */}
 
-        {displayedDeliverables.length > 0 ? (
-          <div className="mt-7">
-            <p className="m-0 text-[10px] font-black uppercase tracking-[0.17em] text-[var(--mr-gold-200)]">
-              Campaign Deliverables
-            </p>
+        {displayedDeliverables.length >
+        0 ? (
+          <div
+            className={
+              compact
+                ? "mt-4"
+                : "mt-5"
+            }
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="m-0 text-[8px] font-black uppercase tracking-[0.15em] text-[var(--mr-gold-200)] sm:text-[9px]">
+                Included
+              </p>
 
-            <ul className="mt-4 grid list-none gap-3 p-0">
+              {additionalDeliverableCount >
+              0 ? (
+                <span className="text-[7px] font-black uppercase tracking-[0.1em] text-white/24 sm:text-[8px]">
+                  +
+                  {
+                    additionalDeliverableCount
+                  }{" "}
+                  More
+                </span>
+              ) : null}
+            </div>
+
+            <ul
+              className={joinClasses(
+                "grid list-none p-0",
+
+                compact
+                  ? "mt-2.5 gap-1.5"
+                  : "mt-3 gap-2",
+              )}
+            >
               {displayedDeliverables.map(
-                (deliverable) => (
-                  <li
-                    key={deliverable}
-                    className="flex items-start gap-3 text-xs leading-5 text-white/52"
+                (
+                  deliverable,
+                  index,
+                ) => (
+                  <CampaignDeliverable
+                    key={
+                      deliverable
+                    }
+                    hiddenOnMobile={
+                      !compact &&
+                      index >= 3
+                    }
                   >
-                    <span className="mt-0.5 grid h-5 w-5 flex-[0_0_20px] place-items-center rounded-full border border-[var(--campaign-border)] bg-[var(--campaign-accent-soft)] text-[var(--campaign-accent)]">
-                      <CheckIcon />
-                    </span>
-
-                    <span>
-                      {deliverable}
-                    </span>
-                  </li>
+                    {deliverable}
+                  </CampaignDeliverable>
                 ),
               )}
             </ul>
-
-            {additionalDeliverableCount >
-            0 ? (
-              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.11em] text-white/30">
-                +
-                {
-                  additionalDeliverableCount
-                }{" "}
-                additional{" "}
-                {additionalDeliverableCount ===
-                1
-                  ? "deliverable"
-                  : "deliverables"}
-              </p>
-            ) : null}
           </div>
         ) : null}
 
         {/* ------------------------------------------------------------- */}
-        {/* Best For                                                      */}
+        {/* Best For — Desktop / Full Cards Only                          */}
         {/* ------------------------------------------------------------- */}
 
-        {campaign.bestFor.length > 0 ? (
-          <div className="mt-6">
-            <p className="m-0 text-[9px] font-black uppercase tracking-[0.15em] text-white/35">
+        {!compact &&
+        campaign.bestFor.length >
+          0 ? (
+          <div className="mt-4 hidden sm:block">
+            <p className="m-0 text-[8px] font-black uppercase tracking-[0.13em] text-white/28">
               Best For
             </p>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {campaign.bestFor
-                .slice(0, 3)
-                .map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex min-h-8 items-center rounded-full border border-white/[0.075] bg-white/[0.025] px-3 text-[9px] font-bold uppercase tracking-[0.1em] text-white/42"
-                  >
-                    {item}
-                  </span>
-                ))}
+                .slice(
+                  0,
+                  3,
+                )
+                .map(
+                  (
+                    item,
+                  ) => (
+                    <span
+                      key={
+                        item
+                      }
+                      className={[
+                        "inline-flex min-h-7 items-center",
+                        "rounded-full",
+                        "border border-white/[0.065]",
+                        "bg-white/[0.02]",
+                        "px-2.5",
+                        "text-[7px] font-bold uppercase",
+                        "tracking-[0.09em]",
+                        "text-white/35",
+                      ].join(" ")}
+                    >
+                      {item}
+                    </span>
+                  ),
+                )}
             </div>
           </div>
         ) : null}
 
         {/* ------------------------------------------------------------- */}
-        {/* Price and Actions                                             */}
+        {/* Price + Actions                                               */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="mt-auto pt-8">
-          <Divider variant="soft" />
+        <div
+          className={joinClasses(
+            "mt-auto",
 
-          <div className="mt-6 flex items-end justify-between gap-5">
-            <div>
-              <p className="m-0 text-[9px] font-black uppercase tracking-[0.16em] text-white/35">
-                One-Time Campaign
-              </p>
+            compact
+              ? "pt-4"
+              : "pt-5",
+          )}
+        >
+          {/* Divider */}
 
-              <p className="mt-1 text-3xl font-black tracking-[-0.055em] text-[var(--mr-text)]">
-                {getCampaignPriceLabel(
-                  campaign,
-                )}
-              </p>
+          <div className="h-px bg-white/[0.055]" />
 
-              <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/28">
-                No Subscription Required
-              </p>
-            </div>
-
-            <span className="grid h-10 w-10 place-items-center rounded-full border border-[var(--campaign-border)] bg-[var(--campaign-accent-soft)] text-[var(--campaign-accent)]">
-              {isPurchasable ? (
-                <CartIcon />
-              ) : (
-                <LockIcon />
-              )}
-            </span>
-          </div>
+          {/* Price */}
 
           <div
             className={joinClasses(
-              "mt-6 grid gap-3",
-              showAddToCart &&
-                "sm:grid-cols-2",
+              "flex items-end justify-between gap-4",
+
+              compact
+                ? "mt-3"
+                : "mt-4",
+            )}
+          >
+            <div className="min-w-0">
+              <p className="m-0 text-[7px] font-black uppercase tracking-[0.13em] text-white/28 sm:text-[8px]">
+                One-Time Campaign
+              </p>
+
+              <p
+                className={joinClasses(
+                  "mt-1 font-black tracking-[-0.05em]",
+                  "text-[var(--mr-text)]",
+
+                  compact
+                    ? "text-2xl"
+                    : "text-[1.7rem] sm:text-3xl",
+                )}
+              >
+                {priceLabel}
+              </p>
+
+              {!compact ? (
+                <p className="mt-1 text-[7px] font-bold uppercase tracking-[0.1em] text-white/20 sm:text-[8px]">
+                  No Subscription Required
+                </p>
+              ) : null}
+            </div>
+
+            <span
+              className={joinClasses(
+                "grid place-items-center rounded-full",
+                "border border-[var(--campaign-border)]",
+                "bg-[var(--campaign-accent-soft)]",
+                "text-[var(--campaign-accent)]",
+
+                compact
+                  ? "h-9 w-9"
+                  : "h-10 w-10",
+              )}
+            >
+              {isPurchasable
+                ? <CartIcon />
+                : <LockIcon />}
+            </span>
+          </div>
+
+          {/* ----------------------------------------------------------- */}
+          {/* Actions                                                     */}
+          {/* ----------------------------------------------------------- */}
+
+          <div
+            className={joinClasses(
+              "grid gap-2.5",
+
+              compact
+                ? [
+                    "mt-3",
+                    showAddToCart
+                      ? "grid-cols-[0.8fr_1.2fr]"
+                      : "grid-cols-1",
+                  ].join(" ")
+                : [
+                    "mt-4",
+                    showAddToCart
+                      ? "grid-cols-1 sm:grid-cols-2"
+                      : "grid-cols-1",
+                  ].join(" "),
             )}
           >
             <Button
-              href={resolvedDetailsHref}
+              href={
+                resolvedDetailsHref
+              }
               variant="secondary"
               size="sm"
-              rightIcon={<ArrowIcon />}
+              rightIcon={
+                compact
+                  ? undefined
+                  : <ArrowIcon />
+              }
               fullWidth
             >
-              {resolvedDetailsLabel}
+              {compact
+                ? "Details"
+                : resolvedDetailsLabel}
             </Button>
 
             {showAddToCart ? (
               isPurchasable ? (
                 <AddToCartButton
-                  sku={campaign.sku}
+                  sku={
+                    campaign.sku
+                  }
                   label={
                     resolvedAddToCartLabel
                   }
@@ -782,7 +1355,9 @@ export default function CampaignCard({
                   }
                   size="sm"
                   fullWidth
-                  cartHref={cartHref}
+                  cartHref={
+                    cartHref
+                  }
                   openCartOnAdd={
                     openCartOnAdd
                   }
@@ -795,14 +1370,18 @@ export default function CampaignCard({
                 <Button
                   variant="dark"
                   size="sm"
-                  leftIcon={<LockIcon />}
+                  leftIcon={
+                    <LockIcon />
+                  }
                   disabled
                   fullWidth
                 >
-                  {getCampaignStatusLabel(
-                    campaign.status,
-                    campaign.purchasable,
-                  )}
+                  {compact
+                    ? "Unavailable"
+                    : getCampaignStatusLabel(
+                        campaign.status,
+                        campaign.purchasable,
+                      )}
                 </Button>
               )
             ) : null}
@@ -813,17 +1392,11 @@ export default function CampaignCard({
           {/* ----------------------------------------------------------- */}
 
           {showDisclaimer ? (
-            <div className="mt-5 border-t border-white/[0.055] pt-4">
-              <p className="m-0 text-[9px] leading-4 text-white/30">
-                Campaign targets represent
-                estimated promotional reach,
-                exposure, impressions, or
-                listener opportunities—not
-                guaranteed streams, followers,
-                placements, revenue, or
-                results.
-              </p>
-            </div>
+            <CampaignDisclaimer
+              compact={
+                compact
+              }
+            />
           ) : null}
         </div>
       </div>

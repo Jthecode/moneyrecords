@@ -6,14 +6,21 @@
    ┃ License: Proprietary — Money Records LLC                             ┃ */
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import type {
+  Metadata,
+} from "next";
+
+import type {
+  ReactNode,
+} from "react";
 
 import ArtistCard from "@/components/ArtistCard";
-import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Container from "@/components/Container";
-import Divider from "@/components/Divider";
+import EmptyState from "@/components/EmptyState";
+import MobileSectionScroller from "@/components/MobileSectionScroller";
+import PageHero from "@/components/PageHero";
+import SectionHeader from "@/components/SectionHeader";
 
 import {
   getFeaturedArtists,
@@ -27,7 +34,6 @@ import {
 } from "@/data/releases";
 
 import CTA from "@/sections/CTA";
-import Hero from "@/sections/Hero";
 import LatestReleases from "@/sections/LatestReleases";
 import MarketingPreview from "@/sections/MarketingPreview";
 import TopRank from "@/sections/TopRank";
@@ -121,26 +127,6 @@ export const metadata: Metadata = {
 /* Icons                                                                  */
 /* --------------------------------------------------------------------- */
 
-function ArrowIcon(): ReactNode {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      fill="none"
-    >
-      <path
-        d="M5 12H19M14 7L19 12L14 17"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function ArtistIcon(): ReactNode {
   return (
     <svg
@@ -232,6 +218,40 @@ function GlobeIcon(): ReactNode {
   );
 }
 
+function MegaphoneIcon(): ReactNode {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+    >
+      <path
+        d="M4 11V14C4 15.1 4.9 16 6 16H8L17 20V5L8 9H6C4.9 9 4 9.9 4 11Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M8 16L9.5 20"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M20 9V16"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function CheckIcon(): ReactNode {
   return (
     <svg
@@ -257,13 +277,14 @@ function CheckIcon(): ReactNode {
 /* --------------------------------------------------------------------- */
 
 /**
- * Uses specifically featured releases first.
+ * Uses featured releases first.
  *
- * When no release is marked as featured, the homepage falls back to the
- * newest public releases instead of displaying an empty catalog.
+ * If no release is explicitly featured, the homepage falls back to the
+ * newest public releases instead of displaying an empty release section.
  */
 function getHomepageReleases(
-  limit = 3,
+  limit =
+    3,
 ): readonly Release[] {
   const featuredReleases =
     getFeaturedReleases(
@@ -283,6 +304,141 @@ function getHomepageReleases(
 }
 
 /* --------------------------------------------------------------------- */
+/* Label Operating Strip                                                  */
+/* --------------------------------------------------------------------- */
+
+function LabelOperatingStrip() {
+  const standards = [
+    {
+      label:
+        "Artist Development",
+
+      description:
+        "Build the artist, brand, catalog, and release direction.",
+
+      icon:
+        <ArtistIcon />,
+    },
+
+    {
+      label:
+        "Official Releases",
+
+      description:
+        "Create a cleaner home for music, artwork, and release details.",
+
+      icon:
+        <MusicIcon />,
+    },
+
+    {
+      label:
+        "Global Distribution",
+
+      description:
+        "Prepare releases for a professional digital distribution process.",
+
+      icon:
+        <GlobeIcon />,
+    },
+
+    {
+      label:
+        "Platform Marketing",
+
+      description:
+        "Choose campaigns across streaming, social, video, press, and radio.",
+
+      icon:
+        <MegaphoneIcon />,
+    },
+  ] as const;
+
+  return (
+    <section
+      aria-label="Money Records label capabilities"
+      className="mt-4 sm:mt-5"
+    >
+      <Container size="wide">
+        <Card
+          padding="sm"
+          className="relative overflow-hidden"
+        >
+          {/* Ambient glow */}
+
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[rgba(227,179,77,0.06)] blur-[90px]"
+          />
+
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-[12%] top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(227,179,77,0.34),transparent)]"
+          />
+
+          <div className="relative grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-0">
+            {standards.map(
+              (
+                standard,
+                index,
+              ) => (
+                <div
+                  key={
+                    standard.label
+                  }
+                  className={[
+                    "flex min-w-0 flex-col gap-2.5",
+                    "rounded-[16px]",
+                    "border border-white/[0.05]",
+                    "bg-white/[0.015]",
+                    "p-3",
+                    "sm:flex-row",
+                    "sm:items-start",
+                    "sm:gap-3",
+                    "sm:p-4",
+                    "lg:rounded-none",
+                    "lg:border-y-0",
+                    "lg:border-r-0",
+                    "lg:bg-transparent",
+
+                    index > 0
+                      ? "lg:border-l lg:border-white/[0.065]"
+                      : "lg:border-l-0",
+                  ].join(" ")}
+                >
+                  <span
+                    className={[
+                      "grid h-9 w-9 flex-[0_0_36px]",
+                      "place-items-center",
+                      "rounded-xl",
+                      "border border-[rgba(227,179,77,0.2)]",
+                      "bg-[rgba(211,154,46,0.05)]",
+                      "text-[var(--mr-gold-200)]",
+                    ].join(" ")}
+                  >
+                    {standard.icon}
+                  </span>
+
+                  <div className="min-w-0">
+                    <p className="m-0 text-[8px] font-black uppercase leading-4 tracking-[0.11em] text-white/58 sm:text-[9px]">
+                      {standard.label}
+                    </p>
+
+                    <p className="mt-1.5 hidden text-[10px] leading-5 text-white/30 sm:block">
+                      {standard.description}
+                    </p>
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </Card>
+      </Container>
+    </section>
+  );
+}
+
+/* --------------------------------------------------------------------- */
 /* Featured Artist Section                                                */
 /* --------------------------------------------------------------------- */
 
@@ -296,81 +452,63 @@ function HomepageArtistRoster({
     <section
       id="artists"
       aria-labelledby="homepage-artists-heading"
-      className="scroll-mt-28 py-14 md:py-20"
+      className="scroll-mt-28 py-10 sm:py-12 lg:py-16"
     >
       <Container size="wide">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-3xl">
-            <p className="m-0 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--mr-gold-200)]">
-              Money Records Roster
-            </p>
+        {/* ------------------------------------------------------------- */}
+        {/* Section Heading                                               */}
+        {/* ------------------------------------------------------------- */}
 
-            <h2
-              id="homepage-artists-heading"
-              className="mt-3 text-3xl font-black leading-tight tracking-[-0.05em] text-[var(--mr-text)] sm:text-4xl lg:text-5xl"
-            >
+        <SectionHeader
+          id="homepage-artists-heading"
+          eyebrow="Money Records Roster"
+          title={
+            <>
               Artists Built for{" "}
               <span className="mr-text-gradient">
                 the Next Level.
               </span>
-            </h2>
+            </>
+          }
+          description="Discover featured talent, official releases, artist stories, and the developing Money Records roster."
+          align="split"
+          width="lg"
+          primaryAction={{
+            label:
+              "Explore All Artists",
 
-            <p className="mt-5 max-w-3xl text-sm leading-7 text-white/48 sm:text-base">
-              Discover the artists developing their sound, audience, catalog,
-              brand, and global presence with Money Records.
-            </p>
-          </div>
+            href:
+              "/artists",
+          }}
+          secondaryAction={{
+            label:
+              "Submit Your Music",
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-            <Button
-              href="/artists"
-              variant="primary"
-              size="lg"
-              rightIcon={
-                <ArrowIcon />
-              }
-              className="w-full md:w-auto"
-            >
-              Explore All Artists
-            </Button>
-
-            <Button
-              href="/submit-music"
-              variant="secondary"
-              size="lg"
-              className="w-full md:w-auto"
-            >
-              Submit Your Music
-            </Button>
-          </div>
-        </div>
-
-        <Divider
-          className="my-8"
-          variant="strong"
+            href:
+              "/submit-music",
+          }}
         />
 
-        {artists.length > 0 ? (
-          <div
-            className={
-              artists.length === 1
-                ? "grid gap-6"
-                : "grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-            }
-          >
-            {artists.map(
-              (
-                artist,
-                index,
-              ) => {
-                const isFeaturedCard =
-                  artists.length === 1 ||
-                  (
-                    index === 0 &&
-                    artists.length > 2
-                  );
+        {/* ------------------------------------------------------------- */}
+        {/* Artist Content                                                */}
+        {/* ------------------------------------------------------------- */}
 
-                return (
+        <div className="mt-7 sm:mt-8">
+          {artists.length >
+          0 ? (
+            <MobileSectionScroller
+              ariaLabel="Featured Money Records artists"
+              itemSize="normal"
+              desktopBreakpoint="lg"
+              showArrows={false}
+              showProgress
+              trackClassName="lg:grid-cols-3"
+            >
+              {artists.map(
+                (
+                  artist,
+                  index,
+                ) => (
                   <ArtistCard
                     key={
                       artist.id
@@ -378,181 +516,111 @@ function HomepageArtistRoster({
                     artist={
                       artist
                     }
-                    variant={
-                      isFeaturedCard
-                        ? "featured"
-                        : "default"
-                    }
+                    variant="default"
                     priority={
-                      index < 2
+                      index === 0
                     }
                     showRelease
                     showGenres
                     showLocation
-                    className={
-                      artists.length === 1
-                        ? "mx-auto w-full max-w-5xl"
-                        : isFeaturedCard
-                          ? "md:col-span-2 xl:col-span-2"
-                          : undefined
-                    }
                   />
-                );
-              },
-            )}
-          </div>
-        ) : (
-          <EmptyArtistRoster />
-        )}
+                ),
+              )}
+            </MobileSectionScroller>
+          ) : (
+            <EmptyState
+              icon={
+                <ArtistIcon />
+              }
+              eyebrow="Money Records Roster"
+              title={
+                <>
+                  New Artist Profiles Are{" "}
+                  <span className="mr-text-gradient">
+                    Coming.
+                  </span>
+                </>
+              }
+              description="Money Records is developing a roster of independent talent. Artists can submit music, release information, streaming links, social profiles, and creative direction for consideration."
+              primaryAction={{
+                label:
+                  "Submit Your Music",
+
+                href:
+                  "/submit-music",
+              }}
+              secondaryAction={{
+                label:
+                  "Explore Artists",
+
+                href:
+                  "/artists",
+              }}
+              size="md"
+            />
+          )}
+        </div>
       </Container>
     </section>
   );
 }
 
 /* --------------------------------------------------------------------- */
-/* Empty Artist Roster                                                    */
+/* Homepage Trust Strip                                                   */
 /* --------------------------------------------------------------------- */
 
-function EmptyArtistRoster() {
-  return (
-    <Card
-      as="section"
-      variant="featured"
-      padding="lg"
-      topLine
-      className="relative overflow-hidden"
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-[rgba(227,179,77,0.08)] blur-[110px]"
-      />
-
-      <div className="relative mx-auto max-w-2xl py-10 text-center">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-[24px] border border-[rgba(227,179,77,0.24)] bg-[rgba(211,154,46,0.065)] text-[var(--mr-gold-200)]">
-          <ArtistIcon />
-        </span>
-
-        <p className="mt-7 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--mr-gold-200)]">
-          Money Records Roster
-        </p>
-
-        <h3 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[var(--mr-text)]">
-          New Artist Profiles Are Coming
-        </h3>
-
-        <p className="mt-5 text-sm leading-7 text-white/48 sm:text-base">
-          Money Records is developing an elite roster of independent talent.
-          Artists can submit music, release information, artist links, and
-          their creative direction for consideration.
-        </p>
-
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button
-            href="/submit-music"
-            variant="primary"
-            size="lg"
-            rightIcon={
-              <ArrowIcon />
-            }
-            className="w-full sm:w-auto"
-          >
-            Submit Your Music
-          </Button>
-
-          <Button
-            href="/artists"
-            variant="secondary"
-            size="lg"
-            className="w-full sm:w-auto"
-          >
-            Explore the Roster
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-/* --------------------------------------------------------------------- */
-/* Label Operating Strip                                                  */
-/* --------------------------------------------------------------------- */
-
-function LabelOperatingStrip() {
+function HomepageTrustStrip() {
   const standards = [
-    {
-      label:
-        "Artist Development",
-
-      icon:
-        <ArtistIcon />,
-    },
-    {
-      label:
-        "Official Releases",
-
-      icon:
-        <MusicIcon />,
-    },
-    {
-      label:
-        "Global Distribution",
-
-      icon:
-        <GlobeIcon />,
-    },
-    {
-      label:
-        "Platform Marketing",
-
-      icon:
-        <CheckIcon />,
-    },
-  ];
+    "Independent Record Label",
+    "Artist-Focused Support",
+    "Platform-Specific Campaigns",
+    "Secure Campaign Checkout",
+  ] as const;
 
   return (
     <section
-      aria-label="Money Records label capabilities"
-      className="mt-6"
+      aria-label="Money Records operating standards"
+      className="py-6 sm:py-8"
     >
       <Container size="wide">
-        <Card
-          padding="md"
-          className="relative overflow-hidden"
+        <div
+          className={[
+            "relative overflow-hidden",
+            "rounded-[22px]",
+            "border border-[rgba(227,179,77,0.13)]",
+            "bg-[linear-gradient(135deg,rgba(211,154,46,0.035),rgba(255,255,255,0.012))]",
+            "px-4 py-4",
+            "sm:px-5",
+          ].join(" ")}
         >
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[rgba(227,179,77,0.065)] blur-[90px]"
+            className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[rgba(227,179,77,0.055)] blur-[85px]"
           />
 
-          <div className="relative grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="relative grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-4">
             {standards.map(
               (
                 standard,
-                index,
               ) => (
                 <div
                   key={
-                    standard.label
+                    standard
                   }
-                  className={[
-                    "flex min-h-12 items-center gap-3 px-2 py-2",
-                    index > 0
-                      ? "xl:border-l xl:border-white/[0.065] xl:pl-6"
-                      : "",
-                  ].join(" ")}
+                  className="flex min-w-0 items-center gap-2.5"
                 >
-                  <span className="grid h-8 w-8 flex-[0_0_32px] place-items-center rounded-full border border-[rgba(227,179,77,0.22)] bg-[rgba(211,154,46,0.055)] text-[var(--mr-gold-200)]">
-                    {standard.icon}
+                  <span className="grid h-6 w-6 flex-[0_0_24px] place-items-center rounded-full border border-[rgba(227,179,77,0.18)] bg-[rgba(211,154,46,0.04)] text-[var(--mr-gold-200)]">
+                    <CheckIcon />
                   </span>
 
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/55">
-                    {standard.label}
+                  <span className="text-[8px] font-black uppercase leading-4 tracking-[0.1em] text-white/38 sm:text-[9px]">
+                    {standard}
                   </span>
                 </div>
               ),
             )}
           </div>
-        </Card>
+        </div>
       </Container>
     </section>
   );
@@ -578,16 +646,32 @@ export default function HomePage() {
       id="top"
       className="mr-page relative overflow-hidden"
     >
-      {/* Global homepage atmosphere */}
+      {/* --------------------------------------------------------------- */}
+      {/* Global Homepage Atmosphere                                      */}
+      {/* --------------------------------------------------------------- */}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[1050px] w-[1500px] max-w-[130vw] -translate-x-1/2 rounded-full bg-[rgba(227,179,77,0.045)] blur-[210px]"
+        className={[
+          "pointer-events-none absolute",
+          "left-1/2 top-0 -z-10",
+          "h-[900px] w-[1400px]",
+          "max-w-[130vw]",
+          "-translate-x-1/2",
+          "rounded-full",
+          "bg-[rgba(227,179,77,0.04)]",
+          "blur-[200px]",
+        ].join(" ")}
       />
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20 opacity-[0.14] [background-image:radial-gradient(rgba(227,179,77,0.11)_0.7px,transparent_0.7px)] [background-size:28px_28px]"
+        className={[
+          "pointer-events-none absolute inset-0 -z-20",
+          "opacity-[0.11]",
+          "[background-image:radial-gradient(rgba(227,179,77,0.11)_0.7px,transparent_0.7px)]",
+          "[background-size:28px_28px]",
+        ].join(" ")}
       />
 
       {/* --------------------------------------------------------------- */}
@@ -596,19 +680,93 @@ export default function HomePage() {
 
       <section
         aria-label="Money Records introduction"
-        className="scroll-mt-28 pt-2 md:pt-4"
+        className="scroll-mt-28 pt-2 sm:pt-3"
       >
         <Container size="wide">
-          <Hero
-            eyebrow="Independent Record Label · Platform Marketing"
+          <PageHero
+            eyebrow="Independent Record Label · Global Marketing"
+            badges={[
+              {
+                label:
+                  "Independent Since 2019",
+
+                tone:
+                  "gold",
+              },
+
+              {
+                label:
+                  "Artist Submissions Open",
+
+                tone:
+                  "success",
+              },
+            ]}
             title={
-              "Build the Record.\nDevelop the Artist.\nMove the Release."
+              <>
+                Build the Record.{" "}
+                <span className="mr-text-gradient">
+                  Develop the Artist.
+                </span>{" "}
+                Move the Release.
+              </>
             }
-            subtitle="Money Records combines artist development, official release support, music distribution, Spotify marketing, Apple Music promotion, Instagram campaigns, TikTok marketing, YouTube support, VEVO services, press, radio, SoundCloud promotion, and artist branding inside one premium music ecosystem."
-            primaryCtaHref="/services"
-            primaryCtaLabel="Explore Platform Services"
-            secondaryCtaHref="/releases"
-            secondaryCtaLabel="Explore Our Releases"
+            subtitle="One independent music company connecting artist development, official releases, distribution, and platform-specific marketing."
+            description="Explore Money Records artists and releases, submit your music, or choose individual campaigns across Spotify, Apple Music, Instagram, TikTok, YouTube, VEVO, press, radio, SoundCloud, and artist branding."
+            primaryAction={{
+              label:
+                "Explore Platform Services",
+
+              href:
+                "/services",
+            }}
+            secondaryAction={{
+              label:
+                "Submit Your Music",
+
+              href:
+                "/submit-music",
+            }}
+            footerContent={
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[8px] font-black uppercase tracking-[0.12em] text-white/28 sm:text-[9px]">
+                <span>
+                  Artist Development
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="text-[var(--mr-gold-300)]"
+                >
+                  •
+                </span>
+
+                <span>
+                  Distribution
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="text-[var(--mr-gold-300)]"
+                >
+                  •
+                </span>
+
+                <span>
+                  Music Marketing
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="text-[var(--mr-gold-300)]"
+                >
+                  •
+                </span>
+
+                <span>
+                  Official Releases
+                </span>
+              </div>
+            }
           />
         </Container>
       </section>
@@ -634,7 +792,7 @@ export default function HomePage() {
             </span>
           </>
         }
-        subtitle="Explore official releases, artist pages, artwork, release details, and verified streaming destinations supported by the Money Records label and platform-marketing system."
+        subtitle="Explore featured releases, artist pages, artwork, release information, and verified streaming destinations from the Money Records catalog."
         releases={
           homepageReleases
         }
@@ -645,7 +803,6 @@ export default function HomePage() {
         campaignLabel="Promote Your Release"
         submissionHref="/submit-music"
         submissionLabel="Submit Your Music"
-        showInfrastructurePanel
       />
 
       {/* --------------------------------------------------------------- */}
@@ -656,6 +813,28 @@ export default function HomePage() {
         artists={
           featuredArtists
         }
+      />
+
+      {/* --------------------------------------------------------------- */}
+      {/* Platform Marketing Storefront                                   */}
+      {/* --------------------------------------------------------------- */}
+
+      <MarketingPreview
+        id="marketing"
+        eyebrow="Money Records Marketing"
+        title={
+          <>
+            Choose Your Platform.{" "}
+            <span className="mr-text-gradient">
+              Select Your Service.
+            </span>
+          </>
+        }
+        subtitle="Browse individual marketing services across streaming, social media, video, press, radio, SoundCloud, VEVO, and artist branding."
+        servicesHref="/services"
+        servicesLabel="Explore All Platform Services"
+        consultationHref="/contact"
+        consultationLabel="Ask About a Platform"
       />
 
       {/* --------------------------------------------------------------- */}
@@ -677,7 +856,7 @@ export default function HomePage() {
               </span>
             </>
           }
-          subtitle="Work with Money Records for artist development, music distribution, release support, or individual promotional services across the platforms that matter most."
+          subtitle="Work with Money Records for artist development, music distribution, release support, or individual promotional campaigns across the platforms that matter most."
           ctaHref="/services"
           ctaLabel="Explore Platform Services"
           secondaryCtaHref="/submit-music"
@@ -686,26 +865,10 @@ export default function HomePage() {
       </section>
 
       {/* --------------------------------------------------------------- */}
-      {/* Platform Marketing Storefront                                   */}
+      {/* Compact Trust Strip                                             */}
       {/* --------------------------------------------------------------- */}
 
-      <MarketingPreview
-        id="marketing"
-        eyebrow="Money Records Marketing"
-        title={
-          <>
-            Choose Your Platform.{" "}
-            <span className="mr-text-gradient">
-              Select Your Service.
-            </span>
-          </>
-        }
-        subtitle="Browse individual marketing services for Spotify, Apple Music, Instagram, TikTok, YouTube, VEVO, press, radio, SoundCloud, and artist branding."
-        servicesHref="/services"
-        servicesLabel="Explore All Platform Services"
-        consultationHref="/contact"
-        consultationLabel="Ask About a Platform"
-      />
+      <HomepageTrustStrip />
 
       {/* --------------------------------------------------------------- */}
       {/* Credibility and Operating Standards                             */}
@@ -714,7 +877,7 @@ export default function HomePage() {
       <section
         id="rank"
         aria-label="Why artists choose Money Records"
-        className="scroll-mt-28 py-12 md:py-16"
+        className="scroll-mt-28 py-8 sm:py-10 lg:py-12"
       >
         <TopRank
           eyebrow="Why Money Records"
@@ -726,7 +889,7 @@ export default function HomePage() {
               </span>
             </>
           }
-          subtitle="Money Records connects artist development, release preparation, distribution, official catalog pages, and individual platform-marketing services under one professional music brand."
+          subtitle="Money Records connects artist development, release preparation, distribution, catalog presentation, and platform-specific marketing under one professional independent music brand."
           primaryCtaHref="/services"
           primaryCtaLabel="Explore Platform Services"
           secondaryCtaHref="/submit-music"

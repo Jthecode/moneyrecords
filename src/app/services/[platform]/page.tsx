@@ -1,17 +1,14 @@
 // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 /* ┃ Money Records — Dynamic Platform Page                                 ┃
    ┃ File   : src/app/services/[platform]/page.tsx                         ┃
-   ┃ Role   : Elite platform storefront and campaign selection page        ┃
+   ┃ Role   : Mobile-first platform storefront and campaign selection page ┃
    ┃ Status : Production Ready                                             ┃
    ┃ License: Proprietary — Money Records LLC                              ┃ */
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type {
-  CSSProperties,
-  ReactNode,
-} from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import Button from "@/components/Button";
 import CampaignCard from "@/components/CampaignCard";
@@ -19,7 +16,9 @@ import CampaignDisclaimer from "@/components/CampaignDisclaimer";
 import Card from "@/components/Card";
 import Container from "@/components/Container";
 import Divider from "@/components/Divider";
-import SectionHeading from "@/components/SectionHeading";
+import MobileSectionScroller from "@/components/MobileSectionScroller";
+import PageHero from "@/components/PageHero";
+import SectionHeader from "@/components/SectionHeader";
 
 import {
   getCampaignsByPlatform,
@@ -53,13 +52,45 @@ type PlatformPageStyle = CSSProperties & {
 };
 
 /* --------------------------------------------------------------------- */
+/* Route Configuration                                                    */
+/* --------------------------------------------------------------------- */
+
+export const dynamicParams = false;
+
+/* --------------------------------------------------------------------- */
 /* Site Configuration                                                     */
 /* --------------------------------------------------------------------- */
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-  "https://moneyrecords.io"
-).replace(/\/+$/, "");
+const DEFAULT_SITE_URL =
+  "https://moneyrecords.io";
+
+function getSiteUrl(): string {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (!configuredUrl) {
+    return DEFAULT_SITE_URL;
+  }
+
+  try {
+    const parsedUrl =
+      new URL(configuredUrl);
+
+    if (
+      parsedUrl.protocol !== "https:" &&
+      parsedUrl.protocol !== "http:"
+    ) {
+      return DEFAULT_SITE_URL;
+    }
+
+    return parsedUrl.origin;
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
+const siteUrl =
+  getSiteUrl();
 
 /* --------------------------------------------------------------------- */
 /* Static Route Generation                                                */
@@ -68,9 +99,11 @@ const siteUrl = (
 export function generateStaticParams(): Array<{
   platform: string;
 }> {
-  return getPlatformSlugs().map((platform) => ({
-    platform,
-  }));
+  return getPlatformSlugs().map(
+    (platform) => ({
+      platform,
+    }),
+  );
 }
 
 /* --------------------------------------------------------------------- */
@@ -80,43 +113,75 @@ export function generateStaticParams(): Array<{
 export async function generateMetadata({
   params,
 }: PlatformPageProps): Promise<Metadata> {
-  const { platform: platformSlug } = await params;
+  const {
+    platform: platformSlug,
+  } =
+    await params;
 
   const platform =
-    getPlatformBySlug(platformSlug);
+    getPlatformBySlug(
+      platformSlug,
+    );
 
-  if (!platform || !platform.visible) {
+  if (
+    !platform ||
+    !platform.visible
+  ) {
     return {
-      title: "Platform Not Found",
+      title:
+        "Platform Not Found",
+
       description:
         "The requested Money Records marketing platform could not be found.",
+
       robots: {
-        index: false,
-        follow: false,
+        index:
+          false,
+
+        follow:
+          false,
       },
     };
   }
 
   return {
-    title: platform.seoTitle,
-    description: platform.seoDescription,
+    title:
+      platform.seoTitle,
+
+    description:
+      platform.seoDescription,
 
     alternates: {
-      canonical: platform.href,
+      canonical:
+        platform.href,
     },
 
     openGraph: {
-      type: "website",
-      url: platform.href,
-      siteName: "Money Records LLC",
-      title: platform.seoTitle,
-      description: platform.seoDescription,
+      type:
+        "website",
+
+      url:
+        platform.href,
+
+      siteName:
+        "Money Records LLC",
+
+      title:
+        platform.seoTitle,
+
+      description:
+        platform.seoDescription,
     },
 
     twitter: {
-      card: "summary_large_image",
-      title: platform.seoTitle,
-      description: platform.seoDescription,
+      card:
+        "summary_large_image",
+
+      title:
+        platform.seoTitle,
+
+      description:
+        platform.seoDescription,
     },
   };
 }
@@ -125,7 +190,7 @@ export async function generateMetadata({
 /* Shared Icons                                                           */
 /* --------------------------------------------------------------------- */
 
-function ArrowIcon() {
+function ArrowIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -145,7 +210,7 @@ function ArrowIcon() {
   );
 }
 
-function BackIcon() {
+function BackIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -165,7 +230,7 @@ function BackIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -185,7 +250,7 @@ function CheckIcon() {
   );
 }
 
-function ClockIcon() {
+function ClockIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -212,7 +277,7 @@ function ClockIcon() {
   );
 }
 
-function SettingsIcon() {
+function SettingsIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -239,7 +304,7 @@ function SettingsIcon() {
   );
 }
 
-function TargetIcon() {
+function TargetIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -274,7 +339,7 @@ function TargetIcon() {
   );
 }
 
-function ShieldIcon() {
+function ShieldIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -301,7 +366,7 @@ function ShieldIcon() {
   );
 }
 
-function GridIcon() {
+function GridIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -353,17 +418,37 @@ function GridIcon() {
   );
 }
 
-/* --------------------------------------------------------------------- */
-/* Platform Icons                                                         */
-/* --------------------------------------------------------------------- */
-
-function SpotifyIcon() {
+function ChevronIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="17"
+      height="17"
+      fill="none"
+    >
+      <path
+        d="M6 9L12 15L18 9"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Platform Icons                                                         */
+/* --------------------------------------------------------------------- */
+
+function SpotifyIcon(): ReactNode {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="32"
+      height="32"
       fill="currentColor"
     >
       <path d="M12 2.5A9.5 9.5 0 1 0 12 21.5A9.5 9.5 0 0 0 12 2.5ZM16.35 16.13a.71.71 0 0 1-.98.23c-2.69-1.64-6.08-2.01-10.07-1.1a.71.71 0 1 1-.32-1.39c4.37-1 8.12-.57 11.14 1.28.34.2.44.64.23.98Zm1.4-3.12a.89.89 0 0 1-1.23.29c-3.08-1.89-7.77-2.43-11.41-1.33a.89.89 0 1 1-.51-1.7c4.16-1.26 9.33-.65 12.86 1.52.42.25.55.8.29 1.22Zm.12-3.25C14.18 7.57 8.09 7.37 4.57 8.43a1.07 1.07 0 1 1-.62-2.05c4.05-1.22 10.79-.98 15.01 1.53a1.07 1.07 0 0 1-1.09 1.85Z" />
@@ -371,13 +456,13 @@ function SpotifyIcon() {
   );
 }
 
-function AppleMusicIcon() {
+function AppleMusicIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -407,13 +492,13 @@ function AppleMusicIcon() {
   );
 }
 
-function InstagramIcon() {
+function InstagramIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <rect
@@ -444,13 +529,13 @@ function InstagramIcon() {
   );
 }
 
-function TikTokIcon() {
+function TikTokIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -471,13 +556,13 @@ function TikTokIcon() {
   );
 }
 
-function YouTubeIcon() {
+function YouTubeIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <rect
@@ -501,13 +586,13 @@ function YouTubeIcon() {
   );
 }
 
-function VevoIcon() {
+function VevoIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -528,13 +613,13 @@ function VevoIcon() {
   );
 }
 
-function PressIcon() {
+function PressIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -554,13 +639,13 @@ function PressIcon() {
   );
 }
 
-function RadioIcon() {
+function RadioIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <rect
@@ -598,13 +683,13 @@ function RadioIcon() {
   );
 }
 
-function SoundCloudIcon() {
+function SoundCloudIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -625,13 +710,13 @@ function SoundCloudIcon() {
   );
 }
 
-function BrandingIcon() {
+function BrandingIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="34"
-      height="34"
+      width="32"
+      height="32"
       fill="none"
     >
       <path
@@ -653,8 +738,21 @@ function BrandingIcon() {
 }
 
 /* --------------------------------------------------------------------- */
-/* Platform Icon Resolver                                                 */
+/* Helpers                                                                */
 /* --------------------------------------------------------------------- */
+
+function joinClasses(
+  ...classes: Array<
+    string |
+    false |
+    null |
+    undefined
+  >
+): string {
+  return classes
+    .filter(Boolean)
+    .join(" ");
+}
 
 function getPlatformIcon(
   icon: PlatformIconKey,
@@ -691,16 +789,6 @@ function getPlatformIcon(
     default:
       return <BrandingIcon />;
   }
-}
-
-/* --------------------------------------------------------------------- */
-/* Helpers                                                                */
-/* --------------------------------------------------------------------- */
-
-function joinClasses(
-  ...classes: Array<string | false | null | undefined>
-): string {
-  return classes.filter(Boolean).join(" ");
 }
 
 function getStatusBadgeClass(
@@ -744,21 +832,30 @@ function getPrimaryAction(
   switch (platform.status) {
     case "live":
       return {
-        href: "#campaigns",
-        label: `View ${platform.shortName} Campaigns`,
+        href:
+          "#campaigns",
+
+        label:
+          `View ${platform.shortName} Campaigns`,
       };
 
     case "custom":
       return {
-        href: "/services#contact",
-        label: `Request ${platform.shortName} Pricing`,
+        href:
+          "/services#contact",
+
+        label:
+          `Request ${platform.shortName} Pricing`,
       };
 
     case "coming-soon":
     default:
       return {
-        href: "/services#contact",
-        label: `Ask About ${platform.shortName}`,
+        href:
+          "/services#contact",
+
+        label:
+          `Ask About ${platform.shortName}`,
       };
   }
 }
@@ -795,6 +892,26 @@ function getAvailabilityDescription(
   }
 }
 
+function serializeStructuredData(
+  data: object,
+): string {
+  return JSON.stringify(
+    data,
+  )
+    .replaceAll(
+      "<",
+      "\\u003c",
+    )
+    .replaceAll(
+      "\u2028",
+      "\\u2028",
+    )
+    .replaceAll(
+      "\u2029",
+      "\\u2029",
+    );
+}
+
 /* --------------------------------------------------------------------- */
 /* Platform Mark                                                          */
 /* --------------------------------------------------------------------- */
@@ -805,19 +922,31 @@ function PlatformMark({
   platform: MarketingPlatform;
 }) {
   return (
-    <div className="relative grid h-24 w-24 flex-[0_0_96px] place-items-center overflow-hidden rounded-[28px] border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)] shadow-[0_24px_70px_rgba(0,0,0,0.46)]">
+    <div
+      className={[
+        "relative grid h-14 w-14 flex-[0_0_56px] place-items-center",
+        "overflow-hidden rounded-[18px] border",
+        "border-[var(--platform-border)]",
+        "bg-[var(--platform-accent-soft)]",
+        "text-[var(--platform-accent)]",
+        "shadow-[0_16px_45px_rgba(0,0,0,0.35)]",
+        "sm:h-16 sm:w-16 sm:flex-basis-[64px] sm:rounded-[20px]",
+      ].join(" ")}
+    >
       <div
         aria-hidden="true"
-        className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[var(--platform-accent)] opacity-20 blur-[45px]"
+        className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[var(--platform-accent)] opacity-20 blur-[28px]"
       />
 
       <div
         aria-hidden="true"
-        className="absolute inset-x-5 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--platform-accent),transparent)] opacity-70"
+        className="absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--platform-accent),transparent)] opacity-70"
       />
 
-      <span className="relative">
-        {getPlatformIcon(platform.icon)}
+      <span className="relative scale-90 sm:scale-100">
+        {getPlatformIcon(
+          platform.icon,
+        )}
       </span>
     </div>
   );
@@ -827,7 +956,7 @@ function PlatformMark({
 /* Hero Summary                                                           */
 /* --------------------------------------------------------------------- */
 
-function PlatformSummary({
+function PlatformHeroSummary({
   platform,
   campaignCount,
   startingPrice,
@@ -838,86 +967,103 @@ function PlatformSummary({
 }) {
   const items = [
     {
-      label: "Availability",
-      value: getPlatformStatusLabel(
-        platform.status,
-      ),
+      label:
+        "Availability",
+
+      value:
+        getPlatformStatusLabel(
+          platform.status,
+        ),
     },
+
     {
-      label: "Campaign Options",
+      label:
+        "Campaigns",
+
       value:
         campaignCount > 0
-          ? `${campaignCount} Available`
+          ? String(
+              campaignCount,
+            )
           : platform.campaignCountLabel,
     },
+
     {
-      label: "Starting Price",
-      value: startingPrice,
+      label:
+        "Starting At",
+
+      value:
+        startingPrice,
     },
-  ];
+  ] as const;
 
   return (
     <Card
       as="aside"
       variant="platform"
-      padding="lg"
+      padding="md"
       topLine
-      className="relative overflow-hidden"
+      className="relative h-full overflow-hidden border-[var(--platform-border)]"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[var(--platform-accent)] opacity-[0.1] blur-[95px]"
+        className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[var(--platform-accent)] opacity-[0.09] blur-[85px]"
       />
 
       <div className="relative">
-        <div className="flex items-center gap-5">
-          <PlatformMark platform={platform} />
+        <div className="flex items-center gap-3.5">
+          <PlatformMark
+            platform={
+              platform
+            }
+          />
 
           <div className="min-w-0">
-            <p className="m-0 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--platform-accent)]">
+            <p className="m-0 text-[8px] font-black uppercase tracking-[0.16em] text-[var(--platform-accent)] sm:text-[9px]">
               Money Records Service
             </p>
 
-            <h2 className="mt-2 text-xl font-black tracking-[-0.035em] text-[var(--mr-text)] sm:text-2xl">
+            <h2 className="mt-1.5 truncate text-base font-black tracking-[-0.03em] text-[var(--mr-text)] sm:text-lg">
               {platform.shortName} Storefront
             </h2>
 
-            <p className="mt-2 text-xs leading-5 text-white/42">
-              Individual platform-specific marketing services.
+            <p className="mt-1 text-[10px] leading-5 text-white/35 sm:text-xs">
+              Platform-specific marketing services.
             </p>
           </div>
         </div>
 
-        <Divider
-          className="my-7"
-          variant="soft"
-        />
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {items.map(
+            (
+              item,
+            ) => (
+              <div
+                key={
+                  item.label
+                }
+                className="min-w-0 rounded-[14px] border border-white/[0.06] bg-white/[0.02] px-2.5 py-3 text-center sm:px-3"
+              >
+                <p className="m-0 truncate text-[7px] font-black uppercase tracking-[0.1em] text-white/25 sm:text-[8px]">
+                  {item.label}
+                </p>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-          {items.map((item) => (
-            <div
-              key={item.label}
-              className="rounded-2xl border border-white/[0.065] bg-white/[0.025] p-4"
-            >
-              <p className="m-0 text-[9px] font-black uppercase tracking-[0.15em] text-white/35">
-                {item.label}
-              </p>
-
-              <p className="mt-2 text-sm font-black leading-5 text-[var(--mr-text)]">
-                {item.value}
-              </p>
-            </div>
-          ))}
+                <p className="mt-1.5 truncate text-xs font-black text-[var(--mr-text)] sm:text-sm">
+                  {item.value}
+                </p>
+              </div>
+            ),
+          )}
         </div>
 
-        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] p-4">
-          <span className="mt-0.5 text-[var(--platform-accent)]">
+        <div className="mt-4 flex items-start gap-2.5 rounded-[16px] border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] p-3.5">
+          <span className="mt-0.5 flex-[0_0_auto] text-[var(--platform-accent)]">
             <ShieldIcon />
           </span>
 
-          <p className="m-0 text-xs leading-5 text-white/45">
-            Review the complete service scope, requirements, timing, and
-            campaign standards before purchasing.
+          <p className="m-0 text-[10px] leading-5 text-white/38">
+            Review scope, requirements, timing, and campaign
+            standards before purchase.
           </p>
         </div>
       </div>
@@ -926,56 +1072,131 @@ function PlatformSummary({
 }
 
 /* --------------------------------------------------------------------- */
-/* Compact Metric                                                         */
+/* Platform Overview Strip                                                */
 /* --------------------------------------------------------------------- */
 
-function PlatformMetric({
-  icon,
-  label,
-  value,
-  description,
+function PlatformOverviewStrip({
+  platform,
+  campaignCount,
+  startingPrice,
 }: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  description: string;
+  platform: MarketingPlatform;
+  campaignCount: number;
+  startingPrice: string;
 }) {
+  const items = [
+    {
+      icon:
+        <GridIcon />,
+
+      label:
+        "Platform",
+
+      value:
+        platform.shortName,
+    },
+
+    {
+      icon:
+        <TargetIcon />,
+
+      label:
+        "Services",
+
+      value:
+        campaignCount > 0
+          ? `${campaignCount} Campaigns`
+          : platform.campaignCountLabel,
+    },
+
+    {
+      icon:
+        <ShieldIcon />,
+
+      label:
+        "Starting Price",
+
+      value:
+        startingPrice,
+    },
+
+    {
+      icon:
+        getStatusIcon(
+          platform.status,
+        ),
+
+      label:
+        "Status",
+
+      value:
+        getPlatformStatusLabel(
+          platform.status,
+        ),
+    },
+  ] as const;
+
   return (
-    <Card
-      as="article"
-      padding="md"
-      hover
-      fullHeight
-      className="group"
+    <section
+      aria-label={`${platform.shortName} service overview`}
+      className="mt-4 sm:mt-5"
     >
-      <div className="flex h-full items-start gap-4">
-        <span className="grid h-11 w-11 flex-[0_0_44px] place-items-center rounded-xl border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
-          {icon}
-        </span>
+      <Card
+        padding="sm"
+        className="relative overflow-hidden"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-[var(--platform-accent)] opacity-[0.045] blur-[80px]"
+        />
 
-        <div className="min-w-0">
-          <p className="m-0 text-[9px] font-black uppercase tracking-[0.15em] text-white/35">
-            {label}
-          </p>
+        <div className="relative grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-0">
+          {items.map(
+            (
+              item,
+              index,
+            ) => (
+              <div
+                key={
+                  item.label
+                }
+                className={[
+                  "flex min-w-0 items-center gap-3 rounded-[15px]",
+                  "border border-white/[0.05] bg-white/[0.012] p-3",
+                  "lg:rounded-none lg:border-y-0 lg:border-r-0 lg:bg-transparent lg:px-4",
 
-          <p className="mt-2 text-lg font-black leading-6 tracking-[-0.03em] text-[var(--mr-text)] transition-colors duration-200 group-hover:text-[var(--platform-accent)]">
-            {value}
-          </p>
+                  index > 0
+                    ? "lg:border-l lg:border-white/[0.06]"
+                    : "lg:border-l-0",
+                ].join(" ")}
+              >
+                <span className="grid h-9 w-9 flex-[0_0_36px] place-items-center rounded-xl border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
+                  {item.icon}
+                </span>
 
-          <p className="mt-2 text-xs leading-5 text-white/42">
-            {description}
-          </p>
+                <div className="min-w-0">
+                  <p className="m-0 truncate text-[7px] font-black uppercase tracking-[0.1em] text-white/24 sm:text-[8px]">
+                    {item.label}
+                  </p>
+
+                  <p className="mt-1 truncate text-[11px] font-black text-[var(--mr-text)] sm:text-xs">
+                    {item.value}
+                  </p>
+                </div>
+              </div>
+            ),
+          )}
         </div>
-      </div>
-    </Card>
+      </Card>
+    </section>
   );
 }
 
 /* --------------------------------------------------------------------- */
-/* Information Panel                                                      */
+/* Information Panels                                                     */
 /* --------------------------------------------------------------------- */
 
-function InformationPanel({
+function DesktopInformationPanel({
   eyebrow,
   title,
   description,
@@ -1022,21 +1243,225 @@ function InformationPanel({
         </p>
 
         <ul className="mt-6 grid list-none gap-3 p-0">
-          {items.map((item) => (
-            <li
-              key={item}
-              className="flex items-start gap-3 text-sm leading-6 text-white/52"
-            >
-              <span className="mt-0.5 grid h-5 w-5 flex-[0_0_20px] place-items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
-                <CheckIcon />
-              </span>
+          {items.map(
+            (
+              item,
+            ) => (
+              <li
+                key={
+                  item
+                }
+                className="flex items-start gap-3 text-sm leading-6 text-white/52"
+              >
+                <span className="mt-0.5 grid h-5 w-5 flex-[0_0_20px] place-items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
+                  <CheckIcon />
+                </span>
 
-              <span>{item}</span>
-            </li>
-          ))}
+                <span>
+                  {item}
+                </span>
+              </li>
+            ),
+          )}
         </ul>
       </div>
     </Card>
+  );
+}
+
+function MobileInformationAccordion({
+  eyebrow,
+  title,
+  description,
+  items,
+  icon,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: readonly string[];
+  icon: ReactNode;
+}) {
+  return (
+    <details
+      className={[
+        "group overflow-hidden",
+        "rounded-[20px]",
+        "border border-white/[0.065]",
+        "bg-white/[0.018]",
+      ].join(" ")}
+    >
+      <summary
+        className={[
+          "flex min-h-16 cursor-pointer list-none",
+          "items-center justify-between gap-4",
+          "px-4 py-3.5",
+          "[&::-webkit-details-marker]:hidden",
+        ].join(" ")}
+      >
+        <span className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-10 flex-[0_0_40px] place-items-center rounded-xl border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
+            {icon}
+          </span>
+
+          <span className="min-w-0">
+            <span className="block truncate text-[8px] font-black uppercase tracking-[0.14em] text-[var(--platform-accent)]">
+              {eyebrow}
+            </span>
+
+            <span className="mt-1 block truncate text-sm font-black text-[var(--mr-text)]">
+              {title}
+            </span>
+          </span>
+        </span>
+
+        <span
+          aria-hidden="true"
+          className={[
+            "grid h-8 w-8 flex-[0_0_32px] place-items-center",
+            "rounded-full",
+            "border border-white/[0.06]",
+            "bg-white/[0.02]",
+            "text-white/28",
+            "transition duration-200",
+            "group-open:rotate-180",
+            "group-open:border-[var(--platform-border)]",
+            "group-open:text-[var(--platform-accent)]",
+          ].join(" ")}
+        >
+          <ChevronIcon />
+        </span>
+      </summary>
+
+      <div className="border-t border-white/[0.05] px-4 pb-4 pt-3.5">
+        <p className="text-xs leading-6 text-white/38">
+          {description}
+        </p>
+
+        <ul className="mt-4 grid list-none gap-2.5 p-0">
+          {items.map(
+            (
+              item,
+            ) => (
+              <li
+                key={
+                  item
+                }
+                className="flex items-start gap-2.5 text-xs leading-5 text-white/48"
+              >
+                <span className="mt-0.5 grid h-[18px] w-[18px] flex-[0_0_18px] place-items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
+                  <CheckIcon />
+                </span>
+
+                <span>
+                  {item}
+                </span>
+              </li>
+            ),
+          )}
+        </ul>
+      </div>
+    </details>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Platform Details                                                       */
+/* --------------------------------------------------------------------- */
+
+function PlatformDetails({
+  platform,
+}: {
+  platform: MarketingPlatform;
+}) {
+  return (
+    <section
+      id="details"
+      aria-label={`${platform.shortName} service details`}
+      className="mt-10 scroll-mt-28 sm:mt-12 lg:mt-16"
+    >
+      <SectionHeader
+        eyebrow={`${platform.shortName} Service Details`}
+        title={
+          <>
+            Built for the{" "}
+            <span className="mr-text-gradient">
+              Platform and Release.
+            </span>
+          </>
+        }
+        description={`Review the service capabilities and the artists or releases that may be best suited for ${platform.name}.`}
+        align="split"
+        width="lg"
+        secondaryAction={{
+          label:
+            "Ask Money Records",
+
+          href:
+            "/services#contact",
+        }}
+      />
+
+      {/* --------------------------------------------------------------- */}
+      {/* Mobile Accordions                                               */}
+      {/* --------------------------------------------------------------- */}
+
+      <div className="mt-6 grid gap-3 md:hidden">
+        <MobileInformationAccordion
+          eyebrow="Service Capabilities"
+          title="What Money Records Supports"
+          description={`The primary areas Money Records can support through its ${platform.shortName} services.`}
+          items={
+            platform.capabilities
+          }
+          icon={
+            <TargetIcon />
+          }
+        />
+
+        <MobileInformationAccordion
+          eyebrow="Recommended Use"
+          title="Best Suited For"
+          description={`The types of releases, artists, or promotional goals that may fit ${platform.shortName}.`}
+          items={
+            platform.bestFor
+          }
+          icon={
+            <CheckIcon />
+          }
+        />
+      </div>
+
+      {/* --------------------------------------------------------------- */}
+      {/* Desktop Panels                                                  */}
+      {/* --------------------------------------------------------------- */}
+
+      <div className="mt-8 hidden gap-5 md:grid lg:grid-cols-2">
+        <DesktopInformationPanel
+          eyebrow="Service Capabilities"
+          title="What Money Records Supports"
+          description={`The primary areas Money Records can support through its ${platform.shortName} services.`}
+          items={
+            platform.capabilities
+          }
+          icon={
+            <TargetIcon />
+          }
+        />
+
+        <DesktopInformationPanel
+          eyebrow="Recommended Use"
+          title="Best Suited For"
+          description={`The types of releases, artists, or promotional goals that may fit ${platform.shortName}.`}
+          items={
+            platform.bestFor
+          }
+          icon={
+            <CheckIcon />
+          }
+        />
+      </div>
+    </section>
   );
 }
 
@@ -1049,20 +1474,22 @@ function CampaignStorefront({
   campaigns,
 }: {
   platform: MarketingPlatform;
-  campaigns: MarketingCampaign[];
+  campaigns: readonly MarketingCampaign[];
 }) {
-  if (campaigns.length === 0) {
+  if (
+    campaigns.length ===
+    0
+  ) {
     return null;
   }
 
   return (
     <section
       id="campaigns"
-      aria-labelledby="platform-campaigns-heading"
-      className="mt-16 scroll-mt-28"
+      aria-label={`${platform.shortName} campaign storefront`}
+      className="mt-10 scroll-mt-28 sm:mt-12 lg:mt-16"
     >
-      <SectionHeading
-        headingId="platform-campaigns-heading"
+      <SectionHeader
         eyebrow={`${platform.shortName} Campaign Store`}
         title={
           <>
@@ -1072,26 +1499,46 @@ function CampaignStorefront({
             </span>
           </>
         }
-        subtitle={`Compare ${campaigns.length} individual ${platform.shortName} campaign levels. Open any service to review its target, price, timing, deliverables, requirements, and exclusions.`}
-        width="wide"
-        right={
-          <Button
-            href="/services#contact"
-            variant="secondary"
-          >
-            Need Help Choosing?
-          </Button>
-        }
+        description={`Compare ${campaigns.length} individual ${platform.shortName} campaign levels. Each service has its own target, price, timing, deliverables, requirements, and campaign standards.`}
+        align="split"
+        width="lg"
+        secondaryAction={{
+          label:
+            "Need Help Choosing?",
+
+          href:
+            "/services#contact",
+        }}
       />
 
-      <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {campaigns.map((campaign) => (
-          <CampaignCard
-            key={campaign.id}
-            campaign={campaign}
-            platform={platform}
-          />
-        ))}
+      <div className="mt-6 sm:mt-8">
+        <MobileSectionScroller
+          ariaLabel={`${platform.shortName} marketing campaigns`}
+          itemSize="wide"
+          desktopBreakpoint="lg"
+          showProgress
+          showArrows
+          trackClassName="lg:grid-cols-3"
+        >
+          {campaigns.map(
+            (
+              campaign,
+            ) => (
+              <CampaignCard
+                key={
+                  campaign.id
+                }
+                campaign={
+                  campaign
+                }
+                platform={
+                  platform
+                }
+                compact
+              />
+            ),
+          )}
+        </MobileSectionScroller>
       </div>
     </section>
   );
@@ -1107,7 +1554,14 @@ function PlatformAvailabilityPanel({
   platform: MarketingPlatform;
 }) {
   const custom =
-    platform.status === "custom";
+    platform.status ===
+    "custom";
+
+  const displayedCapabilities =
+    platform.capabilities.slice(
+      0,
+      4,
+    );
 
   return (
     <Card
@@ -1115,55 +1569,81 @@ function PlatformAvailabilityPanel({
       variant="featured"
       padding="lg"
       topLine
-      className="relative mt-16 overflow-hidden"
+      className="relative mt-10 overflow-hidden sm:mt-12 lg:mt-16"
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-28 -top-32 h-96 w-96 rounded-full bg-[var(--platform-accent)] opacity-[0.09] blur-[110px]"
       />
 
-      <div className="relative grid gap-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+      <div className="relative grid gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-9">
         <div className="max-w-3xl">
-          <span className={getStatusBadgeClass(platform.status)}>
-            {getStatusIcon(platform.status)}
-            {getPlatformStatusLabel(platform.status)}
+          <span
+            className={
+              getStatusBadgeClass(
+                platform.status,
+              )
+            }
+          >
+            {getStatusIcon(
+              platform.status,
+            )}
+
+            {getPlatformStatusLabel(
+              platform.status,
+            )}
           </span>
 
-          <h2 className="mt-5 text-balance text-2xl font-black leading-[1.05] tracking-[-0.04em] text-[var(--mr-text)] sm:text-3xl">
-            {getAvailabilityHeading(platform)}
+          <h2 className="mt-4 text-balance text-xl font-black leading-[1.08] tracking-[-0.04em] text-[var(--mr-text)] sm:text-2xl lg:text-3xl">
+            {getAvailabilityHeading(
+              platform,
+            )}
           </h2>
 
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/52">
-            {getAvailabilityDescription(platform)}
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/46">
+            {getAvailabilityDescription(
+              platform,
+            )}
           </p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {platform.capabilities
-              .slice(0, 4)
-              .map((capability) => (
-                <div
-                  key={capability}
-                  className="flex items-start gap-3 rounded-2xl border border-white/[0.065] bg-white/[0.025] p-4"
-                >
-                  <span className="mt-0.5 grid h-6 w-6 flex-[0_0_24px] place-items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
-                    <CheckIcon />
-                  </span>
+          {displayedCapabilities.length >
+          0 ? (
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              {displayedCapabilities.map(
+                (
+                  capability,
+                ) => (
+                  <div
+                    key={
+                      capability
+                    }
+                    className="flex items-start gap-2.5 rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-3"
+                  >
+                    <span className="mt-0.5 grid h-5 w-5 flex-[0_0_20px] place-items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]">
+                      <CheckIcon />
+                    </span>
 
-                  <span className="text-xs leading-5 text-white/52">
-                    {capability}
-                  </span>
-                </div>
-              ))}
-          </div>
+                    <span className="text-[11px] leading-5 text-white/45 sm:text-xs">
+                      {capability}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          ) : null}
         </div>
 
-        <div className="grid gap-3">
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
           <Button
             href="/services#contact"
             variant="platform"
-            platformAccent={platform.accent}
+            platformAccent={
+              platform.accent
+            }
             size="lg"
-            rightIcon={<ArrowIcon />}
+            rightIcon={
+              <ArrowIcon />
+            }
             fullWidth
           >
             {custom
@@ -1175,10 +1655,12 @@ function PlatformAvailabilityPanel({
             href="/services#platforms"
             variant="secondary"
             size="lg"
-            leftIcon={<BackIcon />}
+            leftIcon={
+              <BackIcon />
+            }
             fullWidth
           >
-            Explore Other Platforms
+            Other Platforms
           </Button>
         </div>
       </div>
@@ -1195,66 +1677,132 @@ function PlatformStructuredData({
   campaigns,
 }: {
   platform: MarketingPlatform;
-  campaigns: MarketingCampaign[];
+  campaigns: readonly MarketingCampaign[];
 }) {
   const serviceStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: platform.name,
-    serviceType: platform.eyebrow,
-    description: platform.longDescription,
+    "@context":
+      "https://schema.org",
+
+    "@type":
+      "Service",
+
+    name:
+      platform.name,
+
+    serviceType:
+      platform.eyebrow,
+
+    description:
+      platform.longDescription,
+
     provider: {
-      "@type": "Organization",
-      name: "Money Records LLC",
-      url: siteUrl,
+      "@type":
+        "Organization",
+
+      name:
+        "Money Records LLC",
+
+      url:
+        siteUrl,
     },
-    url: `${siteUrl}${platform.href}`,
+
+    url:
+      `${siteUrl}${platform.href}`,
+
     hasOfferCatalog:
       campaigns.length > 0
         ? {
-            "@type": "OfferCatalog",
-            name: `${platform.shortName} Campaigns`,
-            itemListElement: campaigns.map(
-              (campaign) => ({
-                "@type": "Offer",
-                name: campaign.name,
-                url: `${siteUrl}${campaign.href}`,
-                priceCurrency: campaign.currency,
-                price: (
-                  campaign.priceCents / 100
-                ).toFixed(2),
-                availability:
-                  campaign.status === "live" &&
-                  campaign.purchasable
-                    ? "https://schema.org/InStock"
-                    : "https://schema.org/OutOfStock",
-              }),
-            ),
+            "@type":
+              "OfferCatalog",
+
+            name:
+              `${platform.shortName} Campaigns`,
+
+            itemListElement:
+              campaigns.map(
+                (
+                  campaign,
+                ) => ({
+                  "@type":
+                    "Offer",
+
+                  name:
+                    campaign.name,
+
+                  url:
+                    `${siteUrl}${campaign.href}`,
+
+                  priceCurrency:
+                    campaign.currency,
+
+                  price:
+                    (
+                      campaign.priceCents /
+                      100
+                    ).toFixed(
+                      2,
+                    ),
+
+                  availability:
+                    campaign.status ===
+                      "live" &&
+                    campaign.purchasable
+                      ? "https://schema.org/InStock"
+                      : "https://schema.org/OutOfStock",
+                }),
+              ),
           }
         : undefined,
   };
 
   const breadcrumbStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    "@context":
+      "https://schema.org",
+
+    "@type":
+      "BreadcrumbList",
+
     itemListElement: [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: siteUrl,
+        "@type":
+          "ListItem",
+
+        position:
+          1,
+
+        name:
+          "Home",
+
+        item:
+          siteUrl,
       },
+
       {
-        "@type": "ListItem",
-        position: 2,
-        name: "Services",
-        item: `${siteUrl}/services`,
+        "@type":
+          "ListItem",
+
+        position:
+          2,
+
+        name:
+          "Services",
+
+        item:
+          `${siteUrl}/services`,
       },
+
       {
-        "@type": "ListItem",
-        position: 3,
-        name: platform.name,
-        item: `${siteUrl}${platform.href}`,
+        "@type":
+          "ListItem",
+
+        position:
+          3,
+
+        name:
+          platform.name,
+
+        item:
+          `${siteUrl}${platform.href}`,
       },
     ],
   };
@@ -1262,20 +1810,24 @@ function PlatformStructuredData({
   return (
     <>
       <script
+        id={`${platform.slug}-service-schema`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            serviceStructuredData,
-          ),
+          __html:
+            serializeStructuredData(
+              serviceStructuredData,
+            ),
         }}
       />
 
       <script
+        id={`${platform.slug}-breadcrumb-schema`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            breadcrumbStructuredData,
-          ),
+          __html:
+            serializeStructuredData(
+              breadcrumbStructuredData,
+            ),
         }}
       />
     </>
@@ -1289,281 +1841,293 @@ function PlatformStructuredData({
 export default async function PlatformPage({
   params,
 }: PlatformPageProps) {
-  const { platform: platformSlug } =
+  const {
+    platform: platformSlug,
+  } =
     await params;
 
   const platform =
-    getPlatformBySlug(platformSlug);
+    getPlatformBySlug(
+      platformSlug,
+    );
 
-  if (!platform || !platform.visible) {
+  if (
+    !platform ||
+    !platform.visible
+  ) {
     notFound();
   }
 
   const campaigns =
-    getCampaignsByPlatform(platform.slug);
+    getCampaignsByPlatform(
+      platform.slug,
+    );
 
   const campaignSummary =
-    getPlatformCampaignSummary(platform.slug);
+    getPlatformCampaignSummary(
+      platform.slug,
+    );
 
   const primaryAction =
-    getPrimaryAction(platform);
+    getPrimaryAction(
+      platform,
+    );
 
   const startingPrice =
-    campaignSummary.campaignCount > 0
+    campaignSummary.campaignCount >
+    0
       ? campaignSummary.lowestPriceLabel
       : platform.startingPriceLabel;
 
-  const platformStyle: PlatformPageStyle = {
-    "--platform-accent":
-      platform.accent,
+  const platformStyle:
+    PlatformPageStyle = {
+      "--platform-accent":
+        platform.accent,
 
-    "--platform-accent-soft":
-      platform.accentSoft,
+      "--platform-accent-soft":
+        platform.accentSoft,
 
-    "--platform-border":
-      `color-mix(in srgb, ${platform.accent} 28%, transparent)`,
-  };
+      "--platform-border":
+        `color-mix(in srgb, ${platform.accent} 28%, transparent)`,
+    };
+
+  const heroHighlights =
+    platform.highlights.slice(
+      0,
+      3,
+    );
 
   return (
     <div
       id="top"
       className="mr-page relative overflow-hidden"
-      style={platformStyle}
+      style={
+        platformStyle
+      }
     >
       <PlatformStructuredData
-        platform={platform}
-        campaigns={campaigns}
+        platform={
+          platform
+        }
+        campaigns={
+          campaigns
+        }
       />
 
-      {/* Page atmosphere */}
+      {/* --------------------------------------------------------------- */}
+      {/* Page Atmosphere                                                 */}
+      {/* --------------------------------------------------------------- */}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-20 -z-10 h-[760px] w-[1180px] max-w-[120vw] -translate-x-1/2 rounded-full bg-[var(--platform-accent)] opacity-[0.05] blur-[180px]"
+        className="pointer-events-none absolute left-1/2 top-12 -z-10 h-[760px] w-[1180px] max-w-[120vw] -translate-x-1/2 rounded-full bg-[var(--platform-accent)] opacity-[0.05] blur-[180px]"
       />
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20 opacity-20 [background-image:radial-gradient(rgba(227,179,77,0.11)_0.7px,transparent_0.7px)] [background-size:26px_26px]"
+        className="pointer-events-none absolute inset-0 -z-20 opacity-[0.12] [background-image:radial-gradient(rgba(227,179,77,0.11)_0.7px,transparent_0.7px)] [background-size:26px_26px]"
       />
 
       <Container size="wide">
-        {/* Breadcrumb */}
+        {/* ------------------------------------------------------------- */}
+        {/* Back Navigation                                               */}
+        {/* ------------------------------------------------------------- */}
 
         <nav
           aria-label="Platform breadcrumb"
-          className="pt-8 md:pt-10"
+          className="pt-4 sm:pt-6 lg:pt-8"
         >
           <Button
             href="/services"
             variant="ghost"
             size="sm"
-            leftIcon={<BackIcon />}
+            leftIcon={
+              <BackIcon />
+            }
           >
             All Platform Services
           </Button>
         </nav>
 
-        {/* Platform Hero */}
+        {/* ------------------------------------------------------------- */}
+        {/* Platform Hero                                                 */}
+        {/* ------------------------------------------------------------- */}
 
         <section
-          aria-labelledby="platform-page-heading"
-          className="relative mt-5 overflow-hidden rounded-[30px] border border-[var(--platform-border)] bg-[linear-gradient(145deg,rgba(18,18,20,0.95),rgba(7,7,8,0.98))] p-6 shadow-[0_30px_110px_rgba(0,0,0,0.52)] sm:p-8 lg:p-11"
+          aria-label={`${platform.name} marketing services`}
+          className="mt-3 scroll-mt-28 sm:mt-4"
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-40 -top-44 h-[500px] w-[500px] rounded-full bg-[var(--platform-accent)] opacity-[0.12] blur-[140px]"
-          />
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-40 -left-32 h-96 w-96 rounded-full bg-[var(--platform-accent)] opacity-[0.035] blur-[120px]"
-          />
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-12 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--platform-accent),transparent)] opacity-70"
-          />
-
-          <div className="relative grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-12">
-            {/* Introduction */}
-
-            <div className="lg:py-3">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span
-                  className={getStatusBadgeClass(
+          <PageHero
+            eyebrow="Money Records Platform Marketing"
+            badges={[
+              {
+                label:
+                  getPlatformStatusLabel(
                     platform.status,
-                  )}
-                >
-                  {getStatusIcon(platform.status)}
-                  {getPlatformStatusLabel(
-                    platform.status,
-                  )}
-                </span>
-
-                <span className="mr-badge mr-badge-dark">
-                  {platform.eyebrow}
-                </span>
-              </div>
-
-              <p className="mt-8 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--platform-accent)]">
-                Money Records Platform Marketing
-              </p>
-
-              <h1
-                id="platform-page-heading"
-                className="mt-4 max-w-4xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.055em] text-[var(--mr-text)] sm:text-5xl lg:text-6xl"
-              >
-                {platform.name}
-              </h1>
-
-              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55 sm:text-lg">
-                {platform.longDescription}
-              </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Button
-                  href={primaryAction.href}
-                  variant="platform"
-                  platformAccent={platform.accent}
-                  size="lg"
-                  rightIcon={<ArrowIcon />}
-                  className="w-full sm:w-auto"
-                >
-                  {primaryAction.label}
-                </Button>
-
-                <Button
-                  href="/services#contact"
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto"
-                >
-                  Ask Money Records
-                </Button>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-2">
-                {platform.highlights.map(
-                  (highlight) => (
-                    <span
-                      key={highlight}
-                      className="inline-flex min-h-9 items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] px-4 text-[9px] font-black uppercase tracking-[0.12em] text-[var(--platform-accent)]"
-                    >
-                      {highlight}
-                    </span>
                   ),
-                )}
-              </div>
-            </div>
 
-            {/* Platform summary */}
+                tone:
+                  platform.status ===
+                  "live"
+                    ? "success"
+                    : platform.status ===
+                        "custom"
+                      ? "gold"
+                      : "neutral",
+              },
 
-            <PlatformSummary
-              platform={platform}
-              campaignCount={
-                campaignSummary.campaignCount
-              }
-              startingPrice={startingPrice}
-            />
-          </div>
-        </section>
+              {
+                label:
+                  platform.eyebrow,
 
-        {/* Platform overview */}
-
-        <section
-          aria-label={`${platform.shortName} service overview`}
-          className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-        >
-          <PlatformMetric
-            icon={<GridIcon />}
-            label="Platform"
-            value={platform.shortName}
-            description={platform.eyebrow}
-          />
-
-          <PlatformMetric
-            icon={<TargetIcon />}
-            label="Available Services"
-            value={
-              campaignSummary.campaignCount > 0
-                ? `${campaignSummary.campaignCount} Campaigns`
-                : platform.campaignCountLabel
-            }
-            description="Each service has its own price and scope."
-          />
-
-          <PlatformMetric
-            icon={<ShieldIcon />}
-            label="Starting Price"
-            value={startingPrice}
-            description="One-time pricing for available fixed-price services."
-          />
-
-          <PlatformMetric
-            icon={getStatusIcon(platform.status)}
-            label="Current Status"
-            value={getPlatformStatusLabel(
-              platform.status,
-            )}
-            description="Availability is shown before service selection."
-          />
-        </section>
-
-        {/* Platform details */}
-
-        <section
-          aria-labelledby="platform-details-heading"
-          className="mt-16"
-        >
-          <SectionHeading
-            headingId="platform-details-heading"
-            eyebrow={`${platform.shortName} Service Details`}
+                tone:
+                  "neutral",
+              },
+            ]}
             title={
-              <>
-                Built for the{" "}
-                <span className="mr-text-gradient">
-                  Platform and Release.
-                </span>
-              </>
+              platform.name
             }
-            subtitle={`Review the service capabilities and the artists or releases that may be best suited for ${platform.name}.`}
-            width="wide"
+            subtitle={
+              platform.longDescription
+            }
+            description={
+              campaignSummary.campaignCount >
+              0
+                ? `Compare ${campaignSummary.campaignCount} available ${platform.shortName} campaign options, then open any service to review its price, target, timing, deliverables, requirements, and exclusions.`
+                : getAvailabilityDescription(
+                    platform,
+                  )
+            }
+            sideContent={
+              <PlatformHeroSummary
+                platform={
+                  platform
+                }
+                campaignCount={
+                  campaignSummary.campaignCount
+                }
+                startingPrice={
+                  startingPrice
+                }
+              />
+            }
+            footerContent={
+              <div className="w-full">
+                {/* ----------------------------------------------------- */}
+                {/* Hero Actions                                          */}
+                {/* ----------------------------------------------------- */}
+
+                <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+                  <Button
+                    href={
+                      primaryAction.href
+                    }
+                    variant="platform"
+                    platformAccent={
+                      platform.accent
+                    }
+                    size="lg"
+                    rightIcon={
+                      <ArrowIcon />
+                    }
+                    className="w-full sm:w-auto"
+                  >
+                    {primaryAction.label}
+                  </Button>
+
+                  <Button
+                    href="/services#contact"
+                    variant="secondary"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
+                    Ask Money Records
+                  </Button>
+                </div>
+
+                {/* ----------------------------------------------------- */}
+                {/* Hero Highlights                                       */}
+                {/* ----------------------------------------------------- */}
+
+                {heroHighlights.length >
+                0 ? (
+                  <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
+                    {heroHighlights.map(
+                      (
+                        highlight,
+                      ) => (
+                        <span
+                          key={
+                            highlight
+                          }
+                          className="inline-flex min-h-7 items-center rounded-full border border-[var(--platform-border)] bg-[var(--platform-accent-soft)] px-2.5 text-[7px] font-black uppercase tracking-[0.09em] text-[var(--platform-accent)] sm:min-h-8 sm:px-3 sm:text-[8px]"
+                        >
+                          {highlight}
+                        </span>
+                      ),
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            }
+            showGlow={
+              false
+            }
+            className="border-[var(--platform-border)]"
           />
-
-          <div className="mt-9 grid gap-5 lg:grid-cols-2">
-            <InformationPanel
-              eyebrow="Service Capabilities"
-              title="What Money Records Supports"
-              description={`The primary areas Money Records can support through its ${platform.shortName} services.`}
-              items={platform.capabilities}
-              icon={<TargetIcon />}
-            />
-
-            <InformationPanel
-              eyebrow="Recommended Use"
-              title="Best Suited For"
-              description={`The types of releases, artists, or promotional goals that may fit ${platform.shortName}.`}
-              items={platform.bestFor}
-              icon={<CheckIcon />}
-            />
-          </div>
         </section>
 
-        {/* Campaign storefront or availability */}
+        {/* ------------------------------------------------------------- */}
+        {/* Overview                                                      */}
+        {/* ------------------------------------------------------------- */}
 
-        {campaigns.length > 0 ? (
+        <PlatformOverviewStrip
+          platform={
+            platform
+          }
+          campaignCount={
+            campaignSummary.campaignCount
+          }
+          startingPrice={
+            startingPrice
+          }
+        />
+
+        {/* ------------------------------------------------------------- */}
+        {/* Campaign Storefront / Availability                            */}
+        {/* ------------------------------------------------------------- */}
+
+        {campaigns.length >
+        0 ? (
           <CampaignStorefront
-            platform={platform}
-            campaigns={campaigns}
+            platform={
+              platform
+            }
+            campaigns={
+              campaigns
+            }
           />
         ) : (
           <PlatformAvailabilityPanel
-            platform={platform}
+            platform={
+              platform
+            }
           />
         )}
 
-        {/* Campaign standards */}
+        {/* ------------------------------------------------------------- */}
+        {/* Platform Details                                              */}
+        {/* ------------------------------------------------------------- */}
+
+        <PlatformDetails
+          platform={
+            platform
+          }
+        />
+
+        {/* ------------------------------------------------------------- */}
+        {/* Campaign Standards                                            */}
+        {/* ------------------------------------------------------------- */}
 
         <Divider
           label={`${platform.shortName} Campaign Standard`}
@@ -1574,10 +2138,18 @@ export default async function PlatformPage({
         <CampaignDisclaimer
           variant="platform"
           size="lg"
-          accent={platform.accent}
-          accentSoft={platform.accentSoft}
-          platformName={platform.shortName}
-          description={platform.disclaimer}
+          accent={
+            platform.accent
+          }
+          accentSoft={
+            platform.accentSoft
+          }
+          platformName={
+            platform.shortName
+          }
+          description={
+            platform.disclaimer
+          }
           includeIntegrityStatement
           points={[
             "Service availability, pricing, timing, deliverables, and requirements may differ by campaign.",
@@ -1586,13 +2158,18 @@ export default async function PlatformPage({
           ]}
         />
 
-        {/* Bottom navigation */}
+        {/* ------------------------------------------------------------- */}
+        {/* Bottom Navigation                                             */}
+        {/* ------------------------------------------------------------- */}
 
-        <div className="flex flex-col gap-3 py-14 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid gap-2.5 py-9 sm:grid-cols-2 sm:py-11 lg:flex lg:items-center lg:justify-between">
           <Button
             href="/services"
             variant="secondary"
-            leftIcon={<BackIcon />}
+            leftIcon={
+              <BackIcon />
+            }
+            className="w-full lg:w-auto"
           >
             All Platform Services
           </Button>
@@ -1600,8 +2177,13 @@ export default async function PlatformPage({
           <Button
             href="/services#contact"
             variant="platform"
-            platformAccent={platform.accent}
-            rightIcon={<ArrowIcon />}
+            platformAccent={
+              platform.accent
+            }
+            rightIcon={
+              <ArrowIcon />
+            }
+            className="w-full lg:w-auto"
           >
             Ask About {platform.shortName}
           </Button>

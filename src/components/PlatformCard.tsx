@@ -7,13 +7,13 @@
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 import Link from "next/link";
+
 import type {
   CSSProperties,
   ReactNode,
 } from "react";
 
 import Card from "@/components/Card";
-import Divider from "@/components/Divider";
 
 import {
   formatPlatformStartingPrice,
@@ -42,6 +42,8 @@ export type PlatformCardProps = {
   /**
    * Maximum number of platform highlights displayed.
    *
+   * Compact cards automatically cap this at 2.
+   *
    * @default 3
    */
   highlightLimit?: number;
@@ -54,14 +56,14 @@ export type PlatformCardProps = {
   showDescription?: boolean;
 
   /**
-   * Displays the platform campaign count.
+   * Displays the platform campaign/service count.
    *
    * @default true
    */
   showCampaignCount?: boolean;
 
   /**
-   * Displays the starting price or availability label.
+   * Displays starting pricing or availability.
    *
    * @default true
    */
@@ -75,7 +77,7 @@ export type PlatformCardProps = {
   fullHeight?: boolean;
 
   /**
-   * Uses a more compact card layout.
+   * Uses the shorter mobile/scroller-friendly layout.
    *
    * @default false
    */
@@ -91,25 +93,30 @@ export type PlatformCardProps = {
    */
   actionLabel?: string;
 
+  /**
+   * Optional additional wrapper classes.
+   */
   className?: string;
 };
 
-type PlatformStyle = CSSProperties & {
-  "--platform-accent"?: string;
-  "--platform-accent-soft"?: string;
-};
+type PlatformStyle =
+  CSSProperties & {
+    "--platform-accent"?: string;
+    "--platform-accent-soft"?: string;
+    "--platform-border"?: string;
+  };
 
 /* --------------------------------------------------------------------- */
 /* Shared Icons                                                           */
 /* --------------------------------------------------------------------- */
 
-function ArrowIcon() {
+function ArrowIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="17"
-      height="17"
+      width="16"
+      height="16"
       fill="none"
     >
       <path
@@ -123,7 +130,7 @@ function ArrowIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -143,7 +150,7 @@ function CheckIcon() {
   );
 }
 
-function ClockIcon() {
+function ClockIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -171,7 +178,7 @@ function ClockIcon() {
   );
 }
 
-function SettingsIcon() {
+function SettingsIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -204,13 +211,13 @@ function SettingsIcon() {
 /* Platform Icons                                                         */
 /* --------------------------------------------------------------------- */
 
-function SpotifyIcon() {
+function SpotifyIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="currentColor"
     >
       <path d="M12 2.5A9.5 9.5 0 1 0 12 21.5A9.5 9.5 0 0 0 12 2.5ZM16.35 16.13a.71.71 0 0 1-.98.23c-2.69-1.64-6.08-2.01-10.07-1.1a.71.71 0 1 1-.32-1.39c4.37-1 8.12-.57 11.14 1.28.34.2.44.64.23.98Zm1.4-3.12a.89.89 0 0 1-1.23.29c-3.08-1.89-7.77-2.43-11.41-1.33a.89.89 0 1 1-.51-1.7c4.16-1.26 9.33-.65 12.86 1.52.42.25.55.8.29 1.22Zm.12-3.25C14.18 7.57 8.09 7.37 4.57 8.43a1.07 1.07 0 1 1-.62-2.05c4.05-1.22 10.79-.98 15.01 1.53a1.07 1.07 0 0 1-1.09 1.85Z" />
@@ -218,13 +225,13 @@ function SpotifyIcon() {
   );
 }
 
-function AppleMusicIcon() {
+function AppleMusicIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -254,13 +261,13 @@ function AppleMusicIcon() {
   );
 }
 
-function InstagramIcon() {
+function InstagramIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <rect
@@ -291,13 +298,13 @@ function InstagramIcon() {
   );
 }
 
-function TikTokIcon() {
+function TikTokIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -318,13 +325,13 @@ function TikTokIcon() {
   );
 }
 
-function YouTubeIcon() {
+function YouTubeIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <rect
@@ -348,13 +355,13 @@ function YouTubeIcon() {
   );
 }
 
-function VevoIcon() {
+function VevoIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -375,13 +382,13 @@ function VevoIcon() {
   );
 }
 
-function PressIcon() {
+function PressIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -401,13 +408,13 @@ function PressIcon() {
   );
 }
 
-function RadioIcon() {
+function RadioIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <rect
@@ -445,13 +452,13 @@ function RadioIcon() {
   );
 }
 
-function SoundCloudIcon() {
+function SoundCloudIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -472,13 +479,13 @@ function SoundCloudIcon() {
   );
 }
 
-function BrandingIcon() {
+function BrandingIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="31"
-      height="31"
+      width="28"
+      height="28"
       fill="none"
     >
       <path
@@ -503,8 +510,13 @@ function BrandingIcon() {
 /* Icon Resolver                                                          */
 /* --------------------------------------------------------------------- */
 
-function getPlatformIcon(icon: PlatformIconKey): ReactNode {
-  switch (icon) {
+function getPlatformIcon(
+  icon:
+    PlatformIconKey,
+): ReactNode {
+  switch (
+    icon
+  ) {
     case "spotify":
       return <SpotifyIcon />;
 
@@ -543,19 +555,62 @@ function getPlatformIcon(icon: PlatformIconKey): ReactNode {
 /* --------------------------------------------------------------------- */
 
 function joinClasses(
-  ...classes: Array<string | false | null | undefined>
+  ...classes: Array<
+    string |
+    false |
+    null |
+    undefined
+  >
 ): string {
-  return classes.filter(Boolean).join(" ");
+  return classes
+    .filter(Boolean)
+    .join(" ");
+}
+
+function sanitizeHighlightLimit(
+  value: number,
+  compact: boolean,
+): number {
+  if (
+    !Number.isFinite(
+      value,
+    )
+  ) {
+    return compact
+      ? 2
+      : 3;
+  }
+
+  const safeValue =
+    Math.max(
+      0,
+      Math.floor(
+        value,
+      ),
+    );
+
+  return compact
+    ? Math.min(
+        2,
+        safeValue,
+      )
+    : safeValue;
 }
 
 function getStatusBadgeClass(
-  platform: MarketingPlatform,
+  platform:
+    MarketingPlatform,
 ): string {
-  if (platform.featured) {
+  if (
+    platform.featured
+  ) {
     return "mr-badge mr-badge-featured";
   }
 
-  if (platform.status === "live") {
+  if (
+    platform.status ===
+    "live"
+  ) {
     return "mr-badge mr-badge-success";
   }
 
@@ -563,9 +618,12 @@ function getStatusBadgeClass(
 }
 
 function getPriceEyebrow(
-  platform: MarketingPlatform,
+  platform:
+    MarketingPlatform,
 ): string {
-  switch (platform.status) {
+  switch (
+    platform.status
+  ) {
     case "live":
       return "Starting At";
 
@@ -579,9 +637,12 @@ function getPriceEyebrow(
 }
 
 function getStatusIcon(
-  platform: MarketingPlatform,
+  platform:
+    MarketingPlatform,
 ): ReactNode {
-  switch (platform.status) {
+  switch (
+    platform.status
+  ) {
     case "live":
       return <CheckIcon />;
 
@@ -595,18 +656,23 @@ function getStatusIcon(
 }
 
 function getDefaultActionLabel(
-  platform: MarketingPlatform,
+  platform:
+    MarketingPlatform,
 ): string {
-  if (platform.actionLabel) {
+  if (
+    platform.actionLabel
+  ) {
     return platform.actionLabel;
   }
 
-  switch (platform.status) {
+  switch (
+    platform.status
+  ) {
     case "live":
       return `Explore ${platform.shortName}`;
 
     case "custom":
-      return `View ${platform.shortName} Services`;
+      return `View ${platform.shortName}`;
 
     case "coming-soon":
     default:
@@ -615,109 +681,389 @@ function getDefaultActionLabel(
 }
 
 /* --------------------------------------------------------------------- */
+/* Status Badge                                                           */
+/* --------------------------------------------------------------------- */
+
+function PlatformStatusBadge({
+  platform,
+}: {
+  platform:
+    MarketingPlatform;
+}) {
+  return (
+    <span
+      className={joinClasses(
+        getStatusBadgeClass(
+          platform,
+        ),
+
+        /*
+         * Prevent status badges from becoming oversized inside narrower
+         * horizontal-scroller cards.
+         */
+        "max-w-[125px] truncate",
+      )}
+    >
+      {getPlatformStatusLabel(
+        platform.status,
+      )}
+    </span>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Highlight                                                              */
+/* --------------------------------------------------------------------- */
+
+function PlatformHighlight({
+  children,
+}: {
+  children:
+    ReactNode;
+}) {
+  return (
+    <li className="flex min-w-0 items-start gap-2 text-[11px] leading-5 text-white/46 sm:text-xs">
+      <span
+        className={[
+          "mt-0.5 grid h-4.5 w-4.5 flex-[0_0_18px] place-items-center",
+          "rounded-full border",
+          "bg-[var(--platform-accent-soft)]",
+          "text-[var(--platform-accent)]",
+        ].join(" ")}
+        style={{
+          borderColor:
+            "var(--platform-border)",
+        }}
+      >
+        <CheckIcon />
+      </span>
+
+      <span className="min-w-0">
+        {children}
+      </span>
+    </li>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Metric                                                                 */
+/* --------------------------------------------------------------------- */
+
+function PlatformMetric({
+  eyebrow,
+  value,
+  icon,
+  accent = false,
+}: {
+  eyebrow: string;
+  value: ReactNode;
+  icon?: ReactNode;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={joinClasses(
+        "min-w-0 rounded-[16px] border px-3 py-3",
+
+        accent
+          ? [
+              "border-[var(--platform-border)]",
+              "bg-[var(--platform-accent-soft)]",
+            ].join(" ")
+          : [
+              "border-white/[0.06]",
+              "bg-white/[0.02]",
+            ].join(" "),
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-1.5">
+        {icon ? (
+          <span
+            aria-hidden="true"
+            className={
+              accent
+                ? "text-[var(--platform-accent)]"
+                : "text-white/28"
+            }
+          >
+            {icon}
+          </span>
+        ) : null}
+
+        <p className="m-0 truncate text-[7px] font-black uppercase tracking-[0.12em] text-white/28 sm:text-[8px]">
+          {eyebrow}
+        </p>
+      </div>
+
+      <p
+        className={joinClasses(
+          "mt-1.5 truncate",
+          "font-black tracking-[-0.025em]",
+          "text-[var(--mr-text)]",
+
+          accent
+            ? "text-base"
+            : "text-xs sm:text-sm",
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
 /* Platform Card                                                          */
 /* --------------------------------------------------------------------- */
 
 export default function PlatformCard({
   platform,
+
   icon,
-  highlightLimit = 3,
-  showDescription = true,
-  showCampaignCount = true,
-  showPricing = true,
-  fullHeight = true,
-  compact = false,
+
+  highlightLimit =
+    3,
+
+  showDescription =
+    true,
+
+  showCampaignCount =
+    true,
+
+  showPricing =
+    true,
+
+  fullHeight =
+    true,
+
+  compact =
+    false,
+
   href,
+
   actionLabel,
+
   className,
 }: PlatformCardProps) {
-  const resolvedHref = href ?? platform.href;
+  const resolvedHref =
+    href ??
+    platform.href;
 
   const resolvedActionLabel =
-    actionLabel ?? getDefaultActionLabel(platform);
+    actionLabel ??
+    getDefaultActionLabel(
+      platform,
+    );
 
-  const headingId = `${platform.id}-platform-heading`;
+  const headingId =
+    `${platform.id}-platform-heading`;
 
-  const platformStyle: PlatformStyle = {
-    "--platform-accent": platform.accent,
-    "--platform-accent-soft": platform.accentSoft,
-  };
+  const safeHighlightLimit =
+    sanitizeHighlightLimit(
+      highlightLimit,
+      compact,
+    );
 
-  const displayedHighlights = platform.highlights.slice(
-    0,
-    Math.max(0, highlightLimit),
-  );
+  const displayedHighlights =
+    platform.highlights.slice(
+      0,
+      safeHighlightLimit,
+    );
+
+  const platformStyle:
+    PlatformStyle = {
+      "--platform-accent":
+        platform.accent,
+
+      "--platform-accent-soft":
+        platform.accentSoft,
+
+      "--platform-border":
+        `color-mix(in srgb, ${platform.accent} 30%, transparent)`,
+    };
+
+  const showMetrics =
+    showPricing ||
+    showCampaignCount;
 
   return (
     <Link
-      href={resolvedHref}
-      aria-labelledby={headingId}
-      className="group block h-full rounded-[var(--mr-radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--platform-accent)] focus-visible:ring-offset-4 focus-visible:ring-offset-black"
-      style={platformStyle}
+      href={
+        resolvedHref
+      }
+      aria-labelledby={
+        headingId
+      }
+      className={[
+        "group block",
+        fullHeight
+          ? "h-full"
+          : "",
+        "rounded-[var(--mr-radius)]",
+        "focus-visible:outline-none",
+        "focus-visible:ring-2",
+        "focus-visible:ring-[var(--platform-accent)]",
+        "focus-visible:ring-offset-4",
+        "focus-visible:ring-offset-black",
+      ].join(" ")}
+      style={
+        platformStyle
+      }
     >
       <Card
         as="article"
-        variant={platform.featured ? "featured" : "platform"}
-        padding={compact ? "md" : "lg"}
+        variant={
+          platform.featured
+            ? "featured"
+            : "platform"
+        }
+        padding="none"
         hover
-        fullHeight={fullHeight}
-        topLine={platform.featured}
+        fullHeight={
+          fullHeight
+        }
+        topLine={
+          platform.featured
+        }
         className={joinClasses(
           "relative overflow-hidden",
-          compact ? "min-h-[360px]" : "min-h-[455px]",
+
+          /*
+           * We no longer force 455px cards on phones.
+           *
+           * The card grows naturally with content, while a reasonable
+           * minimum keeps grids aligned.
+           */
+          compact
+            ? [
+                "min-h-[300px]",
+                "sm:min-h-[320px]",
+              ].join(" ")
+            : [
+                "min-h-[340px]",
+                "sm:min-h-[370px]",
+                "lg:min-h-[390px]",
+              ].join(" "),
+
           className,
         )}
-        style={platformStyle}
+        style={
+          platformStyle
+        }
       >
-        {/* Accent atmosphere */}
+        {/* ------------------------------------------------------------- */}
+        {/* Atmosphere                                                    */}
+        {/* ------------------------------------------------------------- */}
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[var(--platform-accent)] opacity-[0.07] blur-[90px] transition-opacity duration-300 group-hover:opacity-[0.16]"
+          className={[
+            "pointer-events-none absolute -right-20 -top-20",
+            "h-56 w-56",
+            "rounded-full",
+            "bg-[var(--platform-accent)]",
+            "opacity-[0.055]",
+            "blur-[78px]",
+            "transition-opacity duration-300",
+            "group-hover:opacity-[0.11]",
+          ].join(" ")}
         />
+
+        {!compact ? (
+          <div
+            aria-hidden="true"
+            className={[
+              "pointer-events-none absolute -bottom-24 -left-20",
+              "h-52 w-52",
+              "rounded-full",
+              "bg-[var(--platform-accent)]",
+              "opacity-[0.025]",
+              "blur-[82px]",
+            ].join(" ")}
+          />
+        ) : null}
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-28 -left-24 h-64 w-64 rounded-full bg-[var(--platform-accent)] opacity-[0.035] blur-[95px]"
+          className={[
+            "pointer-events-none absolute inset-x-8 top-0",
+            "h-px",
+            "bg-[linear-gradient(90deg,transparent,var(--platform-accent),transparent)]",
+            platform.featured
+              ? "opacity-70"
+              : "opacity-30",
+          ].join(" ")}
         />
 
-        <div className="relative flex h-full flex-col">
+        {/* ------------------------------------------------------------- */}
+        {/* Content                                                       */}
+        {/* ------------------------------------------------------------- */}
+
+        <div
+          className={joinClasses(
+            "relative flex h-full flex-col",
+
+            compact
+              ? "p-4 sm:p-5"
+              : "p-5 sm:p-6",
+          )}
+        >
           {/* ----------------------------------------------------------- */}
           {/* Header                                                      */}
           {/* ----------------------------------------------------------- */}
 
-          <div className="flex items-start justify-between gap-5">
+          <div className="flex items-start justify-between gap-3">
+            {/* Icon */}
+
             <span
               className={joinClasses(
-                "relative grid flex-none place-items-center overflow-hidden",
-                "border bg-[var(--platform-accent-soft)]",
+                "relative grid flex-[0_0_auto] place-items-center",
+                "overflow-hidden border",
+                "bg-[var(--platform-accent-soft)]",
                 "text-[var(--platform-accent)]",
-                "shadow-[0_18px_48px_rgba(0,0,0,0.32)]",
+                "shadow-[0_14px_38px_rgba(0,0,0,0.3)]",
+
                 compact
-                  ? "h-14 w-14 rounded-[18px]"
-                  : "h-16 w-16 rounded-[20px]",
+                  ? [
+                      "h-12 w-12",
+                      "rounded-[15px]",
+                    ].join(" ")
+                  : [
+                      "h-14 w-14",
+                      "rounded-[18px]",
+                      "sm:h-[60px]",
+                      "sm:w-[60px]",
+                    ].join(" "),
               )}
               style={{
                 borderColor:
-                  "color-mix(in srgb, var(--platform-accent) 38%, transparent)",
+                  "var(--platform-border)",
               }}
             >
               <span
                 aria-hidden="true"
-                className="absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,color-mix(in_srgb,var(--platform-accent)_75%,white),transparent)]"
+                className="absolute inset-x-2 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--platform-accent),transparent)] opacity-70"
               />
 
-              {icon ?? getPlatformIcon(platform.icon)}
+              {icon ??
+                getPlatformIcon(
+                  platform.icon,
+                )}
             </span>
 
-            <div className="flex flex-col items-end gap-2">
-              <span className={getStatusBadgeClass(platform)}>
-                {getPlatformStatusLabel(platform.status)}
-              </span>
+            {/* Status */}
 
-              {platform.featured ? (
-                <span className="text-[9px] font-black uppercase tracking-[0.14em] text-white/30">
-                  Featured Platform
+            <div className="flex min-w-0 flex-col items-end gap-1.5">
+              <PlatformStatusBadge
+                platform={
+                  platform
+                }
+              />
+
+              {platform.featured &&
+              !compact ? (
+                <span className="text-[7px] font-black uppercase tracking-[0.12em] text-white/22 sm:text-[8px]">
+                  Featured
                 </span>
               ) : null}
             </div>
@@ -727,9 +1073,15 @@ export default function PlatformCard({
           {/* Identity                                                    */}
           {/* ----------------------------------------------------------- */}
 
-          <div className={compact ? "mt-6" : "mt-7"}>
+          <div
+            className={
+              compact
+                ? "mt-4"
+                : "mt-5"
+            }
+          >
             <p
-              className="m-0 text-[10px] font-black uppercase tracking-[0.18em]"
+              className="m-0 text-[8px] font-black uppercase tracking-[0.16em] sm:text-[9px]"
               style={{
                 color:
                   "color-mix(in srgb, var(--platform-accent) 72%, white)",
@@ -739,15 +1091,26 @@ export default function PlatformCard({
             </p>
 
             <h3
-              id={headingId}
+              id={
+                headingId
+              }
               className={joinClasses(
-                "text-balance font-black leading-[1.05]",
-                "tracking-[-0.04em] text-[var(--mr-text)]",
+                "text-balance font-black leading-[1.06]",
+                "tracking-[-0.035em]",
+                "text-[var(--mr-text)]",
                 "transition-colors duration-200",
                 "group-hover:text-[var(--mr-gold-100)]",
+
                 compact
-                  ? "mt-2.5 text-[1.4rem]"
-                  : "mt-3 text-[1.65rem]",
+                  ? [
+                      "mt-2",
+                      "text-xl",
+                    ].join(" ")
+                  : [
+                      "mt-2",
+                      "text-[1.35rem]",
+                      "sm:text-[1.5rem]",
+                    ].join(" "),
               )}
             >
               {platform.name}
@@ -756,10 +1119,12 @@ export default function PlatformCard({
             {showDescription ? (
               <p
                 className={joinClasses(
-                  "text-sm text-white/50",
+                  "mt-2.5 text-xs leading-5 text-white/43",
+                  "sm:text-sm sm:leading-6",
+
                   compact
-                    ? "mt-3 line-clamp-3 leading-6"
-                    : "mt-4 leading-7",
+                    ? "line-clamp-2"
+                    : "line-clamp-3",
                 )}
               >
                 {platform.description}
@@ -771,117 +1136,142 @@ export default function PlatformCard({
           {/* Highlights                                                  */}
           {/* ----------------------------------------------------------- */}
 
-          {displayedHighlights.length > 0 ? (
+          {displayedHighlights.length >
+          0 ? (
             <ul
               className={joinClasses(
                 "grid list-none p-0",
+
                 compact
-                  ? "mt-5 gap-2"
-                  : "mt-6 gap-2.5",
+                  ? "mt-4 gap-1.5"
+                  : "mt-5 gap-2",
               )}
             >
-              {displayedHighlights.map((highlight) => (
-                <li
-                  key={highlight}
-                  className="flex items-start gap-2.5 text-xs leading-5 text-white/52"
-                >
-                  <span
-                    className="mt-0.5 grid h-5 w-5 flex-[0_0_20px] place-items-center rounded-full border bg-[var(--platform-accent-soft)] text-[var(--platform-accent)]"
-                    style={{
-                      borderColor:
-                        "color-mix(in srgb, var(--platform-accent) 30%, transparent)",
-                    }}
+              {displayedHighlights.map(
+                (
+                  highlight,
+                ) => (
+                  <PlatformHighlight
+                    key={
+                      highlight
+                    }
                   >
-                    <CheckIcon />
-                  </span>
-
-                  <span>{highlight}</span>
-                </li>
-              ))}
+                    {highlight}
+                  </PlatformHighlight>
+                ),
+              )}
             </ul>
           ) : null}
 
           {/* ----------------------------------------------------------- */}
-          {/* Pricing and Availability                                    */}
+          {/* Bottom                                                      */}
           {/* ----------------------------------------------------------- */}
 
-          <div className="mt-auto pt-7">
-            <Divider variant="soft" />
+          <div
+            className={joinClasses(
+              "mt-auto",
 
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {showPricing ? (
-                <div className="rounded-2xl border border-white/[0.065] bg-white/[0.025] p-4">
-                  <p className="m-0 text-[9px] font-black uppercase tracking-[0.15em] text-white/35">
-                    {getPriceEyebrow(platform)}
-                  </p>
+              compact
+                ? "pt-4"
+                : "pt-5",
+            )}
+          >
+            {/* Divider */}
 
-                  <p
-                    className={joinClasses(
-                      "mt-2 font-black tracking-[-0.04em]",
-                      "text-[var(--mr-text)]",
-                      compact
-                        ? "text-lg"
-                        : "text-xl sm:text-2xl",
-                    )}
-                  >
-                    {formatPlatformStartingPrice(platform)}
-                  </p>
-                </div>
-              ) : null}
-
-              {showCampaignCount ? (
-                <div className="rounded-2xl border border-white/[0.065] bg-white/[0.025] p-4">
-                  <div className="flex items-center gap-2 text-[var(--platform-accent)]">
-                    {getStatusIcon(platform)}
-
-                    <p className="m-0 text-[9px] font-black uppercase tracking-[0.15em] text-white/35">
-                      Services
-                    </p>
-                  </div>
-
-                  <p
-                    className={joinClasses(
-                      "mt-2 font-black leading-5",
-                      "tracking-[-0.02em] text-[var(--mr-text)]",
-                      compact
-                        ? "text-sm"
-                        : "text-base",
-                    )}
-                  >
-                    {platform.campaignCountLabel}
-                  </p>
-                </div>
-              ) : null}
-            </div>
+            <div className="h-px bg-white/[0.055]" />
 
             {/* --------------------------------------------------------- */}
-            {/* Full-card Action                                         */}
+            {/* Metrics                                                   */}
+            {/* --------------------------------------------------------- */}
+
+            {showMetrics ? (
+              <div
+                className={joinClasses(
+                  "mt-3 grid gap-2",
+
+                  showPricing &&
+                  showCampaignCount
+                    ? "grid-cols-2"
+                    : "grid-cols-1",
+                )}
+              >
+                {showPricing ? (
+                  <PlatformMetric
+                    eyebrow={
+                      getPriceEyebrow(
+                        platform,
+                      )
+                    }
+                    value={
+                      formatPlatformStartingPrice(
+                        platform,
+                      )
+                    }
+                    accent
+                  />
+                ) : null}
+
+                {showCampaignCount ? (
+                  <PlatformMetric
+                    eyebrow="Services"
+                    value={
+                      platform.campaignCountLabel
+                    }
+                    icon={
+                      getStatusIcon(
+                        platform,
+                      )
+                    }
+                  />
+                ) : null}
+              </div>
+            ) : null}
+
+            {/* --------------------------------------------------------- */}
+            {/* Action                                                    */}
             {/* --------------------------------------------------------- */}
 
             <div
               className={joinClasses(
-                "mt-5 flex min-h-12 items-center justify-between gap-4",
-                "rounded-full border px-5",
+                "flex items-center justify-between gap-3",
+                "rounded-full border",
                 "bg-[var(--platform-accent-soft)]",
                 "font-black uppercase",
                 "text-[var(--platform-accent)]",
-                "transition-all duration-300",
+                "transition duration-300",
                 "group-hover:-translate-y-0.5",
-                "group-hover:bg-[color-mix(in_srgb,var(--platform-accent)_14%,transparent)]",
+                "group-hover:bg-[color-mix(in_srgb,var(--platform-accent)_13%,transparent)]",
+
+                showMetrics
+                  ? "mt-3"
+                  : "mt-4",
+
                 compact
-                  ? "text-[9px] tracking-[0.12em]"
-                  : "text-[10px] tracking-[0.14em]",
+                  ? [
+                      "min-h-10",
+                      "px-3.5",
+                      "text-[8px]",
+                      "tracking-[0.1em]",
+                    ].join(" ")
+                  : [
+                      "min-h-11",
+                      "px-4",
+                      "text-[9px]",
+                      "tracking-[0.12em]",
+                    ].join(" "),
               )}
               style={{
                 borderColor:
-                  "color-mix(in srgb, var(--platform-accent) 28%, transparent)",
+                  "var(--platform-border)",
               }}
             >
-              <span>{resolvedActionLabel}</span>
+              <span className="min-w-0 truncate">
+                {resolvedActionLabel}
+              </span>
 
               <span
                 aria-hidden="true"
-                className="transition-transform duration-300 group-hover:translate-x-1"
+                className="flex-[0_0_auto] transition-transform duration-300 group-hover:translate-x-1"
               >
                 <ArrowIcon />
               </span>
