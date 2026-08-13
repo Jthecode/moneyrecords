@@ -3,7 +3,7 @@
 // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 /* ┃ Money Records — Cart Drawer                                           ┃
    ┃ File   : src/components/CartDrawer.tsx                                ┃
-   ┃ Role   : Global campaign-cart overlay, items, totals, and navigation  ┃
+   ┃ Role   : Global campaign-cart overlay, items, totals, and checkout   ┃
    ┃ Status : Production Ready                                             ┃
    ┃ License: Proprietary — Money Records LLC                              ┃ */
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -13,18 +13,24 @@ import {
   useMemo,
   useRef,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
 } from "react";
 
 import { usePathname } from "next/navigation";
 
 import { useUI } from "@/app/providers";
+
 import Button from "@/components/Button";
 import CartItemCard from "@/components/CartItemCard";
 import CartSummary from "@/components/CartSummary";
 import { useCart } from "@/components/CartProvider";
 import Divider from "@/components/Divider";
+import EmptyState from "@/components/EmptyState";
+import SkeletonCard from "@/components/SkeletonCard";
 
-import { formatCartPrice } from "@/lib/cart";
+import {
+  formatCartPrice,
+} from "@/lib/cart";
 
 /* --------------------------------------------------------------------- */
 /* Types                                                                  */
@@ -60,7 +66,7 @@ export type CartDrawerProps = {
   showItemDetails?: boolean;
 
   /**
-   * Displays the clear-cart action in the summary.
+   * Displays the clear-cart action in the desktop summary.
    *
    * @default true
    */
@@ -71,7 +77,7 @@ export type CartDrawerProps = {
 /* Icons                                                                  */
 /* --------------------------------------------------------------------- */
 
-function CartIcon() {
+function CartIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -107,7 +113,7 @@ function CartIcon() {
   );
 }
 
-function CloseIcon() {
+function CloseIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -126,7 +132,7 @@ function CloseIcon() {
   );
 }
 
-function ArrowIcon() {
+function ArrowIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -146,7 +152,7 @@ function ArrowIcon() {
   );
 }
 
-function ShieldIcon() {
+function ShieldIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
@@ -173,15 +179,63 @@ function ShieldIcon() {
   );
 }
 
+function LockIcon(): ReactNode {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      fill="none"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+
+      <path
+        d="M8 10V7.5C8 5.3 9.8 3.5 12 3.5C14.2 3.5 16 5.3 16 7.5V10"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 /* --------------------------------------------------------------------- */
 /* Helpers                                                                */
 /* --------------------------------------------------------------------- */
 
-function getServiceLabel(count: number): string {
-  return count === 1 ? "service" : "services";
+function joinClasses(
+  ...classes: Array<
+    string |
+    false |
+    null |
+    undefined
+  >
+): string {
+  return classes
+    .filter(Boolean)
+    .join(" ");
 }
 
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
+function getServiceLabel(
+  count: number,
+): string {
+  return count === 1
+    ? "service"
+    : "services";
+}
+
+function getFocusableElements(
+  container: HTMLElement,
+): HTMLElement[] {
   const selector = [
     "a[href]",
     "button:not([disabled])",
@@ -191,10 +245,21 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     '[tabindex]:not([tabindex="-1"])',
   ].join(",");
 
-  return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
-    (element) =>
-      element.getAttribute("aria-hidden") !== "true" &&
-      !element.hasAttribute("hidden"),
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      selector,
+    ),
+  ).filter(
+    (
+      element,
+    ) =>
+      element.getAttribute(
+        "aria-hidden",
+      ) !==
+        "true" &&
+      !element.hasAttribute(
+        "hidden",
+      ),
   );
 }
 
@@ -205,33 +270,24 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 function CartDrawerLoading() {
   return (
     <div
+      role="status"
       aria-busy="true"
       aria-label="Loading campaign cart"
-      className="grid gap-4"
+      className="grid gap-3 sm:gap-4"
     >
-      {[1, 2].map((placeholder) => (
-        <div
-          key={placeholder}
-          className="rounded-[24px] border border-white/[0.065] bg-white/[0.025] p-5"
-        >
-          <div className="animate-pulse">
-            <div className="flex items-start gap-4">
-              <div className="h-14 w-14 flex-[0_0_56px] rounded-[18px] bg-white/[0.065]" />
+      <SkeletonCard
+        variant="compact"
+        ariaLabel="Loading first cart item"
+      />
 
-              <div className="min-w-0 flex-1">
-                <div className="h-3 w-20 rounded-full bg-white/[0.065]" />
-                <div className="mt-4 h-6 w-4/5 rounded-lg bg-white/[0.065]" />
-                <div className="mt-3 h-3 w-28 rounded-full bg-white/[0.04]" />
-              </div>
-            </div>
+      <SkeletonCard
+        variant="compact"
+        ariaLabel="Loading second cart item"
+      />
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="h-16 rounded-2xl bg-white/[0.04]" />
-              <div className="h-16 rounded-2xl bg-white/[0.04]" />
-            </div>
-          </div>
-        </div>
-      ))}
+      <span className="sr-only">
+        Loading campaign cart
+      </span>
     </div>
   );
 }
@@ -246,35 +302,165 @@ function EmptyCartDrawer({
   servicesHref: string;
 }) {
   return (
-    <div className="flex min-h-[55vh] items-center justify-center px-2 py-10">
-      <div className="mx-auto max-w-sm text-center">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-[24px] border border-[rgba(227,179,77,0.24)] bg-[rgba(211,154,46,0.065)] text-[var(--mr-gold-200)] shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <div className="flex min-h-full items-center justify-center py-6 sm:py-10">
+      <EmptyState
+        icon={
           <CartIcon />
-        </span>
+        }
+        eyebrow="Campaign Cart"
+        title={
+          <>
+            Your Cart Is{" "}
+            <span className="mr-text-gradient">
+              Empty.
+            </span>
+          </>
+        }
+        description="Choose a Money Records marketing service and add it to your campaign cart."
+        primaryAction={{
+          label:
+            "Explore Services",
 
-        <p className="mt-7 text-[10px] font-black uppercase tracking-[0.19em] text-[var(--mr-gold-200)]">
-          Campaign Cart
+          href:
+            servicesHref,
+        }}
+        size="md"
+        panel={false}
+        glow={false}
+        className="w-full"
+      />
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Cart Metric                                                            */
+/* --------------------------------------------------------------------- */
+
+function CartMetric({
+  label,
+  value,
+  featured = false,
+}: {
+  label: string;
+  value: ReactNode;
+  featured?: boolean;
+}) {
+  return (
+    <div
+      className={joinClasses(
+        "rounded-[18px] border p-3.5 sm:p-4",
+
+        featured
+          ? [
+              "border-[rgba(227,179,77,0.2)]",
+              "bg-[rgba(211,154,46,0.05)]",
+            ].join(" ")
+          : [
+              "border-white/[0.065]",
+              "bg-white/[0.022]",
+            ].join(" "),
+      )}
+    >
+      <p className="m-0 text-[8px] font-black uppercase tracking-[0.13em] text-white/30 sm:text-[9px]">
+        {label}
+      </p>
+
+      <p className="mt-1.5 text-lg font-black tracking-[-0.035em] text-[var(--mr-text)] sm:mt-2 sm:text-xl">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Mobile Checkout Bar                                                    */
+/* --------------------------------------------------------------------- */
+
+function MobileCheckoutBar({
+  subtotalLabel,
+  checkoutHref,
+  cartHref,
+  itemCount,
+}: {
+  subtotalLabel: string;
+  checkoutHref: string;
+  cartHref: string;
+  itemCount: number;
+}) {
+  return (
+    <div
+      className={[
+        "relative flex-[0_0_auto]",
+        "border-t border-[rgba(227,179,77,0.15)]",
+        "bg-[rgba(5,5,6,0.96)]",
+        "px-4 pt-3",
+        "pb-[max(12px,env(safe-area-inset-bottom))]",
+        "shadow-[0_-22px_65px_rgba(0,0,0,0.46)]",
+        "backdrop-blur-2xl",
+        "sm:hidden",
+      ].join(" ")}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-[18%] top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(227,179,77,0.65),transparent)]"
+      />
+
+      {/* Total */}
+
+      <div className="mb-3 flex items-end justify-between gap-4">
+        <div>
+          <p className="m-0 text-[8px] font-black uppercase tracking-[0.15em] text-white/28">
+            Campaign Total
+          </p>
+
+          <p className="mt-1 text-[10px] text-white/34">
+            {itemCount} selected{" "}
+            {getServiceLabel(
+              itemCount,
+            )}
+          </p>
+        </div>
+
+        <p className="m-0 text-xl font-black tracking-[-0.04em] text-[var(--mr-text)]">
+          {subtotalLabel}
         </p>
+      </div>
 
-        <h2 className="mt-3 text-2xl font-black tracking-[-0.04em] text-[var(--mr-text)]">
-          Your Cart Is Empty
-        </h2>
+      {/* Checkout */}
 
-        <p className="mt-4 text-sm leading-7 text-white/46">
-          Explore the Money Records marketing storefront and choose the
-          platform campaign that fits your release.
-        </p>
+      <Button
+        href={
+          checkoutHref
+        }
+        variant="primary"
+        size="lg"
+        rightIcon={
+          <ArrowIcon />
+        }
+        fullWidth
+      >
+        Continue to Checkout
+      </Button>
 
+      {/* Secondary action */}
+
+      <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-3">
         <Button
-          href={servicesHref}
-          variant="primary"
-          size="lg"
-          rightIcon={<ArrowIcon />}
-          className="mt-7"
-          fullWidth
+          href={
+            cartHref
+          }
+          variant="ghost"
+          size="sm"
+          className="w-full"
         >
-          Explore Marketing Services
+          View Full Cart
         </Button>
+
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[8px] font-black uppercase tracking-[0.1em] text-white/26">
+          <LockIcon />
+          Secure
+        </span>
       </div>
     </div>
   );
@@ -285,18 +471,29 @@ function EmptyCartDrawer({
 /* --------------------------------------------------------------------- */
 
 export default function CartDrawer({
-  cartHref = "/cart",
-  checkoutHref = "/checkout",
-  servicesHref = "/services",
-  showItemDetails = true,
-  showClearCart = true,
+  cartHref =
+    "/cart",
+
+  checkoutHref =
+    "/checkout",
+
+  servicesHref =
+    "/services",
+
+  showItemDetails =
+    true,
+
+  showClearCart =
+    true,
 }: CartDrawerProps) {
-  const pathname = usePathname();
+  const pathname =
+    usePathname();
 
   const {
     isCartOpen,
     closeCart,
-  } = useUI();
+  } =
+    useUI();
 
   const {
     items,
@@ -305,31 +502,41 @@ export default function CartDrawer({
     currency,
     isHydrated,
     isEmpty,
-  } = useCart();
+  } =
+    useCart();
 
   const drawerRef =
-    useRef<HTMLElement | null>(null);
+    useRef<HTMLElement | null>(
+      null,
+    );
 
   const closeButtonRef =
-    useRef<HTMLButtonElement | null>(null);
+    useRef<HTMLButtonElement | null>(
+      null,
+    );
 
   const previouslyFocusedElementRef =
-    useRef<HTMLElement | null>(null);
+    useRef<HTMLElement | null>(
+      null,
+    );
 
   const previousPathnameRef =
-    useRef(pathname);
+    useRef(
+      pathname,
+    );
 
-  const subtotalLabel = useMemo(
-    () =>
-      formatCartPrice(
-        subtotalCents,
+  const subtotalLabel =
+    useMemo(
+      () =>
+        formatCartPrice(
+          subtotalCents,
+          currency,
+        ),
+      [
         currency,
-      ),
-    [
-      currency,
-      subtotalCents,
-    ],
-  );
+        subtotalCents,
+      ],
+    );
 
   /* ------------------------------------------------------------------- */
   /* Close After Route Navigation                                        */
@@ -341,6 +548,7 @@ export default function CartDrawer({
       pathname
     ) {
       closeCart();
+
       previousPathnameRef.current =
         pathname;
     }
@@ -354,37 +562,63 @@ export default function CartDrawer({
   /* ------------------------------------------------------------------- */
 
   useEffect(() => {
-    if (!isCartOpen) {
+    if (
+      !isCartOpen
+    ) {
       return;
     }
 
     previouslyFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement
+      document.activeElement instanceof
+      HTMLElement
         ? document.activeElement
         : null;
 
     const frame =
-      window.requestAnimationFrame(() => {
-        closeButtonRef.current?.focus();
-      });
+      window.requestAnimationFrame(
+        () => {
+          closeButtonRef.current?.focus();
+        },
+      );
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(
+        frame,
+      );
 
-      previouslyFocusedElementRef.current?.focus?.();
-      previouslyFocusedElementRef.current = null;
+      previouslyFocusedElementRef
+        .current
+        ?.focus?.();
+
+      previouslyFocusedElementRef.current =
+        null;
     };
-  }, [isCartOpen]);
+  }, [
+    isCartOpen,
+  ]);
 
   /* ------------------------------------------------------------------- */
   /* Keyboard Focus Trap                                                 */
   /* ------------------------------------------------------------------- */
 
   function handleDrawerKeyDown(
-    event: ReactKeyboardEvent<HTMLElement>,
+    event:
+      ReactKeyboardEvent<HTMLElement>,
   ): void {
     if (
-      event.key !== "Tab" ||
+      event.key ===
+      "Escape"
+    ) {
+      event.preventDefault();
+
+      closeCart();
+
+      return;
+    }
+
+    if (
+      event.key !==
+        "Tab" ||
       !drawerRef.current
     ) {
       return;
@@ -396,9 +630,11 @@ export default function CartDrawer({
       );
 
     if (
-      focusableElements.length === 0
+      focusableElements.length ===
+      0
     ) {
       event.preventDefault();
+
       return;
     }
 
@@ -407,7 +643,8 @@ export default function CartDrawer({
 
     const lastElement =
       focusableElements[
-        focusableElements.length - 1
+        focusableElements.length -
+          1
       ];
 
     const activeElement =
@@ -415,18 +652,23 @@ export default function CartDrawer({
 
     if (
       event.shiftKey &&
-      activeElement === firstElement
+      activeElement ===
+        firstElement
     ) {
       event.preventDefault();
+
       lastElement.focus();
+
       return;
     }
 
     if (
       !event.shiftKey &&
-      activeElement === lastElement
+      activeElement ===
+        lastElement
     ) {
       event.preventDefault();
+
       firstElement.focus();
     }
   }
@@ -435,7 +677,9 @@ export default function CartDrawer({
   /* Closed State                                                        */
   /* ------------------------------------------------------------------- */
 
-  if (!isCartOpen) {
+  if (
+    !isCartOpen
+  ) {
     return null;
   }
 
@@ -448,43 +692,84 @@ export default function CartDrawer({
       className="fixed inset-0 z-[100]"
       aria-label="Campaign cart overlay"
     >
-      {/* Backdrop */}
+      {/* --------------------------------------------------------------- */}
+      {/* Backdrop                                                      */}
+      {/* --------------------------------------------------------------- */}
 
       <button
         type="button"
         aria-label="Close campaign cart"
-        onClick={closeCart}
-        className="absolute inset-0 cursor-default bg-black/78 backdrop-blur-[6px]"
+        onClick={
+          closeCart
+        }
+        className={[
+          "absolute inset-0",
+          "cursor-default",
+          "bg-black/82",
+          "backdrop-blur-[7px]",
+        ].join(" ")}
       />
 
-      {/* Drawer */}
+      {/* --------------------------------------------------------------- */}
+      {/* Drawer                                                         */}
+      {/* --------------------------------------------------------------- */}
 
       <aside
-        ref={drawerRef}
+        ref={
+          drawerRef
+        }
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-drawer-heading"
         aria-describedby="cart-drawer-description"
-        onKeyDown={handleDrawerKeyDown}
+        onKeyDown={
+          handleDrawerKeyDown
+        }
         className={[
-          "absolute bottom-0 right-0 top-0",
-          "flex w-full max-w-[540px] flex-col",
+          /*
+           * MOBILE:
+           * Full-screen cart.
+           */
+          "absolute inset-0",
+
+          /*
+           * TABLET/DESKTOP:
+           * Premium right-side drawer.
+           */
+          "sm:inset-y-0",
+          "sm:left-auto",
+          "sm:right-0",
+          "sm:w-full",
+          "sm:max-w-[540px]",
+
+          /*
+           * Layout.
+           */
+          "flex min-h-0 flex-col",
           "overflow-hidden",
-          "border-l border-[rgba(227,179,77,0.18)]",
-          "bg-[linear-gradient(155deg,rgba(17,17,18,0.99),rgba(5,5,6,1))]",
-          "shadow-[-30px_0_110px_rgba(0,0,0,0.68)]",
+
+          /*
+           * Appearance.
+           */
+          "bg-[linear-gradient(155deg,rgba(17,17,18,0.995),rgba(5,5,6,1))]",
+
+          "sm:border-l",
+          "sm:border-[rgba(227,179,77,0.18)]",
+          "sm:shadow-[-30px_0_110px_rgba(0,0,0,0.68)]",
         ].join(" ")}
       >
-        {/* Gold atmosphere */}
+        {/* ------------------------------------------------------------- */}
+        {/* Background Atmosphere                                        */}
+        {/* ------------------------------------------------------------- */}
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-36 -top-36 h-[420px] w-[420px] rounded-full bg-[rgba(211,154,46,0.12)] blur-[130px]"
+          className="pointer-events-none absolute -right-36 -top-36 h-[420px] w-[420px] rounded-full bg-[rgba(211,154,46,0.11)] blur-[130px]"
         />
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-36 -left-32 h-80 w-80 rounded-full bg-[rgba(184,124,32,0.05)] blur-[115px]"
+          className="pointer-events-none absolute -bottom-36 -left-32 h-80 w-80 rounded-full bg-[rgba(184,124,32,0.045)] blur-[115px]"
         />
 
         <div
@@ -496,50 +781,91 @@ export default function CartDrawer({
         {/* Header                                                        */}
         {/* ------------------------------------------------------------- */}
 
-        <header className="relative flex flex-[0_0_auto] items-start justify-between gap-5 border-b border-white/[0.065] px-5 py-5 sm:px-6 sm:py-6">
-          <div className="flex min-w-0 items-start gap-4">
-            <span className="grid h-12 w-12 flex-[0_0_48px] place-items-center rounded-2xl border border-[rgba(227,179,77,0.24)] bg-[rgba(211,154,46,0.065)] text-[var(--mr-gold-200)]">
+        <header
+          className={[
+            "relative z-10",
+            "flex flex-[0_0_auto]",
+            "items-center justify-between gap-4",
+            "border-b border-white/[0.065]",
+            "bg-[rgba(7,7,8,0.82)]",
+            "px-4",
+            "pt-[max(14px,env(safe-area-inset-top))]",
+            "pb-3.5",
+            "backdrop-blur-xl",
+            "sm:items-start",
+            "sm:px-6",
+            "sm:py-6",
+          ].join(" ")}
+        >
+          <div className="flex min-w-0 items-center gap-3 sm:items-start sm:gap-4">
+            <span
+              className={[
+                "grid h-10 w-10 flex-[0_0_40px] place-items-center",
+                "rounded-[14px]",
+                "border border-[rgba(227,179,77,0.22)]",
+                "bg-[rgba(211,154,46,0.055)]",
+                "text-[var(--mr-gold-200)]",
+                "sm:h-12 sm:w-12 sm:flex-basis-[48px]",
+                "sm:rounded-2xl",
+              ].join(" ")}
+            >
               <CartIcon />
             </span>
 
             <div className="min-w-0">
-              <p className="m-0 text-[9px] font-black uppercase tracking-[0.18em] text-[var(--mr-gold-200)]">
+              <p className="m-0 hidden text-[9px] font-black uppercase tracking-[0.18em] text-[var(--mr-gold-200)] sm:block">
                 Money Records Store
               </p>
 
               <h2
                 id="cart-drawer-heading"
-                className="mt-1 text-xl font-black tracking-[-0.035em] text-[var(--mr-text)] sm:text-2xl"
+                className={[
+                  "m-0 truncate",
+                  "text-lg font-black",
+                  "tracking-[-0.035em]",
+                  "text-[var(--mr-text)]",
+                  "sm:mt-1 sm:text-2xl",
+                ].join(" ")}
               >
                 Campaign Cart
               </h2>
 
               <p
                 id="cart-drawer-description"
-                className="mt-1 text-xs leading-5 text-white/38"
+                className="mt-0.5 text-[10px] leading-5 text-white/34 sm:mt-1 sm:text-xs sm:text-white/38"
               >
                 {isHydrated
-                  ? `${itemCount} selected ${getServiceLabel(itemCount)}`
+                  ? `${itemCount} selected ${getServiceLabel(
+                      itemCount,
+                    )}`
                   : "Loading selected services"}
               </p>
             </div>
           </div>
 
           <button
-            ref={closeButtonRef}
+            ref={
+              closeButtonRef
+            }
             type="button"
             aria-label="Close campaign cart"
-            onClick={closeCart}
+            onClick={
+              closeCart
+            }
             className={[
-              "grid h-11 w-11 flex-[0_0_44px] place-items-center rounded-full",
-              "border border-white/[0.09] bg-white/[0.035]",
-              "text-white/60 transition",
+              "grid h-10 w-10 flex-[0_0_40px] place-items-center",
+              "rounded-full",
+              "border border-white/[0.085]",
+              "bg-white/[0.03]",
+              "text-white/58",
+              "transition duration-200",
               "hover:border-[rgba(227,179,77,0.28)]",
               "hover:bg-[rgba(211,154,46,0.065)]",
               "hover:text-[var(--mr-gold-200)]",
               "focus-visible:outline-none",
               "focus-visible:ring-2",
               "focus-visible:ring-[rgba(227,179,77,0.5)]",
+              "sm:h-11 sm:w-11 sm:flex-basis-[44px]",
             ].join(" ")}
           >
             <CloseIcon />
@@ -547,125 +873,196 @@ export default function CartDrawer({
         </header>
 
         {/* ------------------------------------------------------------- */}
-        {/* Cart Content                                                  */}
+        {/* Scrollable Cart Content                                       */}
         {/* ------------------------------------------------------------- */}
 
-        <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-5 sm:py-6">
+        <div
+          className={[
+            "relative min-h-0 flex-1",
+            "overflow-y-auto",
+            "overscroll-contain",
+            "px-3.5 py-4",
+            "[scrollbar-width:thin]",
+            "sm:px-5 sm:py-6",
+          ].join(" ")}
+        >
           {!isHydrated ? (
             <CartDrawerLoading />
           ) : isEmpty ? (
             <EmptyCartDrawer
-              servicesHref={servicesHref}
+              servicesHref={
+                servicesHref
+              }
             />
           ) : (
-            <div className="grid gap-5">
-              {/* Compact totals */}
+            <div className="grid gap-4 sm:gap-5">
+              {/* ------------------------------------------------------- */}
+              {/* Quick Metrics                                           */}
+              {/* ------------------------------------------------------- */}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
-                  <p className="m-0 text-[9px] font-black uppercase tracking-[0.14em] text-white/35">
-                    Selected Services
-                  </p>
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                <CartMetric
+                  label="Services"
+                  value={
+                    itemCount
+                  }
+                />
 
-                  <p className="mt-2 text-xl font-black tracking-[-0.035em] text-[var(--mr-text)]">
-                    {itemCount}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-[rgba(227,179,77,0.22)] bg-[rgba(211,154,46,0.055)] p-4">
-                  <p className="m-0 text-[9px] font-black uppercase tracking-[0.14em] text-white/35">
-                    Subtotal
-                  </p>
-
-                  <p className="mt-2 text-xl font-black tracking-[-0.035em] text-[var(--mr-text)]">
-                    {subtotalLabel}
-                  </p>
-                </div>
+                <CartMetric
+                  label="Subtotal"
+                  value={
+                    subtotalLabel
+                  }
+                  featured
+                />
               </div>
 
-              {/* Selected items */}
+              {/* ------------------------------------------------------- */}
+              {/* Selected Items                                          */}
+              {/* ------------------------------------------------------- */}
 
               <section
                 aria-labelledby="cart-drawer-items-heading"
               >
-                <div className="mb-4 flex items-end justify-between gap-4">
+                <div className="mb-3 flex items-end justify-between gap-4 sm:mb-4">
                   <div>
-                    <p className="m-0 text-[9px] font-black uppercase tracking-[0.17em] text-[var(--mr-gold-200)]">
+                    <p className="m-0 text-[8px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)] sm:text-[9px]">
                       Selected Campaigns
                     </p>
 
                     <h3
                       id="cart-drawer-items-heading"
-                      className="mt-1 text-lg font-black tracking-[-0.03em] text-[var(--mr-text)]"
+                      className="mt-1 text-base font-black tracking-[-0.03em] text-[var(--mr-text)] sm:text-lg"
                     >
                       Your Services
                     </h3>
                   </div>
 
-                  <span className="inline-flex min-h-8 items-center rounded-full border border-white/[0.075] bg-white/[0.025] px-3 text-[9px] font-black uppercase tracking-[0.12em] text-white/40">
+                  <span className="hidden min-h-8 items-center rounded-full border border-white/[0.075] bg-white/[0.025] px-3 text-[9px] font-black uppercase tracking-[0.12em] text-white/40 sm:inline-flex">
                     Quantity 1 Each
                   </span>
                 </div>
 
-                <div className="grid gap-4">
-                  {items.map((item) => (
-                    <CartItemCard
-                      key={item.sku}
-                      item={item}
-                      compact
-                      showDetails={
-                        showItemDetails
-                      }
-                      showRemove
-                    />
-                  ))}
+                <div className="grid gap-3 sm:gap-4">
+                  {items.map(
+                    (
+                      item,
+                    ) => (
+                      <CartItemCard
+                        key={
+                          item.sku
+                        }
+                        item={
+                          item
+                        }
+                        compact
+                        showDetails={
+                          showItemDetails
+                        }
+                        showRemove
+                      />
+                    ),
+                  )}
                 </div>
               </section>
 
-              <Divider
-                label="Order Summary"
-                variant="soft"
-                spacing="md"
-              />
+              {/* ------------------------------------------------------- */}
+              {/* DESKTOP / TABLET SUMMARY                                */}
+              {/* ------------------------------------------------------- */}
 
-              {/* Existing trusted cart summary */}
+              <div className="hidden sm:block">
+                <Divider
+                  label="Order Summary"
+                  variant="soft"
+                  spacing="md"
+                />
 
-              <CartSummary
-                checkoutHref={checkoutHref}
-                checkoutLabel="Continue to Checkout"
-                continueShoppingHref={servicesHref}
-                continueShoppingLabel="Explore More Services"
-                showClearCart={showClearCart}
-                showStandards={false}
-                sticky={false}
-                title="Campaign Total"
-                subtitle="Review the selected services before secure campaign intake and payment."
-              />
+                <CartSummary
+                  checkoutHref={
+                    checkoutHref
+                  }
+                  checkoutLabel="Continue to Checkout"
+                  continueShoppingHref={
+                    servicesHref
+                  }
+                  continueShoppingLabel="Explore More Services"
+                  showClearCart={
+                    showClearCart
+                  }
+                  showStandards={
+                    false
+                  }
+                  sticky={
+                    false
+                  }
+                  title="Campaign Total"
+                  subtitle="Review the selected services before secure campaign intake and payment."
+                />
 
-              <Button
-                href={cartHref}
-                variant="secondary"
-                size="lg"
-                rightIcon={<ArrowIcon />}
-                fullWidth
-              >
-                Open Full Campaign Cart
-              </Button>
+                <div className="mt-4">
+                  <Button
+                    href={
+                      cartHref
+                    }
+                    variant="secondary"
+                    size="lg"
+                    rightIcon={
+                      <ArrowIcon />
+                    }
+                    fullWidth
+                  >
+                    Open Full Campaign Cart
+                  </Button>
+                </div>
 
-              <div className="flex items-start gap-3 rounded-2xl border border-[rgba(227,179,77,0.18)] bg-[rgba(211,154,46,0.04)] p-4">
-                <span className="mt-0.5 flex-[0_0_auto] text-[var(--mr-gold-200)]">
-                  <ShieldIcon />
-                </span>
+                <div className="mt-4 flex items-start gap-3 rounded-2xl border border-[rgba(227,179,77,0.16)] bg-[rgba(211,154,46,0.035)] p-4">
+                  <span className="mt-0.5 flex-[0_0_auto] text-[var(--mr-gold-200)]">
+                    <ShieldIcon />
+                  </span>
 
-                <p className="m-0 text-[10px] leading-5 text-white/38">
-                  Campaign availability, trusted SKUs, prices, currency, and
-                  checkout totals will be verified again by the server before
-                  payment.
-                </p>
+                  <p className="m-0 text-[10px] leading-5 text-white/36">
+                    Campaign availability,
+                    trusted SKUs, prices,
+                    currency, and checkout
+                    totals are verified by
+                    the server before payment.
+                  </p>
+                </div>
               </div>
+
+              {/* ------------------------------------------------------- */}
+              {/* Mobile breathing room                                   */}
+              {/* ------------------------------------------------------- */}
+
+              <div
+                aria-hidden="true"
+                className="h-1 sm:hidden"
+              />
             </div>
           )}
         </div>
+
+        {/* ------------------------------------------------------------- */}
+        {/* Mobile Sticky Checkout Bar                                    */}
+        {/* ------------------------------------------------------------- */}
+
+        {isHydrated &&
+        !isEmpty ? (
+          <MobileCheckoutBar
+            subtotalLabel={
+              subtotalLabel
+            }
+            checkoutHref={
+              checkoutHref
+            }
+            cartHref={
+              cartHref
+            }
+            itemCount={
+              itemCount
+            }
+          />
+        ) : null}
       </aside>
     </div>
   );

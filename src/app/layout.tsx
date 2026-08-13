@@ -20,8 +20,11 @@ import type {
   ReactNode,
 } from "react";
 
-import NavBar from "@/components/NavBar";
 import Providers from "@/app/providers";
+
+import Footer from "@/components/Footer";
+import MobileBottomBar from "@/components/MobileBottomBar";
+import NavBar from "@/components/NavBar";
 
 import "./globals.css";
 
@@ -243,6 +246,25 @@ export const metadata: Metadata = {
 
     description:
       SITE_DESCRIPTION,
+
+    url:
+      siteOrigin,
+
+    images: [
+      {
+        url:
+          "/brand/mr-crest.png",
+
+        width:
+          512,
+
+        height:
+          512,
+
+        alt:
+          "Money Records",
+      },
+    ],
   },
 
   twitter: {
@@ -254,6 +276,10 @@ export const metadata: Metadata = {
 
     description:
       SITE_DESCRIPTION,
+
+    images: [
+      "/brand/mr-crest.png",
+    ],
   },
 
   robots: {
@@ -296,6 +322,11 @@ export const metadata: Metadata = {
 
     telephone:
       false,
+  },
+
+  other: {
+    "mobile-web-app-capable":
+      "yes",
   },
 };
 
@@ -386,9 +417,14 @@ const organizationStructuredData = {
     "Music Marketing",
     "Spotify Promotion",
     "Apple Music Promotion",
+    "Instagram Music Marketing",
+    "TikTok Music Marketing",
+    "YouTube Music Marketing",
     "Social Media Marketing",
     "Music Public Relations",
     "VEVO Distribution",
+    "Radio Promotion",
+    "Artist Branding",
     "Release Campaigns",
   ],
 };
@@ -430,7 +466,9 @@ const websiteStructuredData = {
 function serializeStructuredData(
   data: object,
 ): string {
-  return JSON.stringify(data)
+  return JSON.stringify(
+    data,
+  )
     .replaceAll(
       "<",
       "\\u003c",
@@ -466,15 +504,45 @@ export default function RootLayout({
         className={[
           geistSans.variable,
           geistMono.variable,
+
+          /*
+           * Root sizing.
+           */
           "min-h-screen",
+
+          /*
+           * Money Records global appearance.
+           */
           "bg-[#050506]",
           "text-white",
           "antialiased",
+
+          /*
+           * Protect mobile layouts from accidental horizontal overflow
+           * caused by wide cards, glows, transforms, or carousels.
+           */
+          "overflow-x-hidden",
         ].join(" ")}
       >
+        {/* ------------------------------------------------------------- */}
+        {/* Global Application Providers                                  */}
+        {/* ------------------------------------------------------------- */}
+
         <Providers>
-          <div className="mr-site min-h-screen">
-            {/* Accessibility skip link */}
+          <div
+            className={[
+              "mr-site",
+
+              /*
+               * Flex layout ensures the footer stays at the bottom even on
+               * pages with little content.
+               */
+              "flex min-h-screen flex-col",
+            ].join(" ")}
+          >
+            {/* --------------------------------------------------------- */}
+            {/* Accessibility                                             */}
+            {/* --------------------------------------------------------- */}
 
             <a
               className="mr-skip-link"
@@ -483,27 +551,70 @@ export default function RootLayout({
               Skip to main content
             </a>
 
-            {/* Global navigation and campaign-cart control */}
+            {/* --------------------------------------------------------- */}
+            {/* Global Navigation                                        */}
+            {/* --------------------------------------------------------- */}
 
             <NavBar />
 
+            {/* --------------------------------------------------------- */}
+            {/* Page Content                                              */}
+            {/* --------------------------------------------------------- */}
+
             {/*
-             * A div is used instead of a second <main> because the cart,
-             * checkout, success, and cancelled pages already contain their
-             * own main landmarks.
+             * We intentionally keep this as a <div> rather than forcing a
+             * second <main> landmark around all routes.
+             *
+             * Some existing Money Records pages currently own their own
+             * semantic <main> element.
+             *
+             * As those pages are cleaned up later, we can standardize the
+             * landmark architecture across the entire application.
              */}
 
             <div
               id="main-content"
               tabIndex={-1}
-              className="outline-none"
+              className={[
+                "relative",
+                "min-w-0",
+                "flex-1",
+                "outline-none",
+              ].join(" ")}
             >
               {children}
             </div>
+
+            {/* --------------------------------------------------------- */}
+            {/* Global Footer                                            */}
+            {/* --------------------------------------------------------- */}
+
+            <Footer />
+
+            {/* --------------------------------------------------------- */}
+            {/* Mobile Quick Navigation                                  */}
+            {/* --------------------------------------------------------- */}
+
+            {/*
+             * MobileBottomBar:
+             *
+             * - Only appears below the md breakpoint.
+             * - Provides Services / Submit Music / Cart.
+             * - Automatically hides on cart and checkout routes.
+             * - Adds its own bottom spacer.
+             * - Supports iPhone safe-area insets.
+             *
+             * It must remain inside Providers because it consumes both
+             * useUI() and useCart().
+             */}
+
+            <MobileBottomBar />
           </div>
         </Providers>
 
-        {/* Organization structured data */}
+        {/* ------------------------------------------------------------- */}
+        {/* Organization Structured Data                                  */}
+        {/* ------------------------------------------------------------- */}
 
         <script
           id="money-records-organization-schema"
@@ -516,7 +627,9 @@ export default function RootLayout({
           }}
         />
 
-        {/* Website structured data */}
+        {/* ------------------------------------------------------------- */}
+        {/* Website Structured Data                                       */}
+        {/* ------------------------------------------------------------- */}
 
         <script
           id="money-records-website-schema"

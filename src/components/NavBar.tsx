@@ -3,7 +3,7 @@
 // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 /* ┃ Money Records — Global Navigation                                    ┃
    ┃ File   : src/components/NavBar.tsx                                   ┃
-   ┃ Role   : Elite responsive navigation, cart, brand, routes, and CTAs ┃
+   ┃ Role   : Responsive navigation, cart access, brand, routes, and CTAs ┃
    ┃ Status : Production Ready                                            ┃
    ┃ License: Proprietary — Money Records LLC                             ┃ */
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -12,9 +12,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import {
-  useEffect,
-  type ReactNode,
+import type {
+  ReactNode,
 } from "react";
 
 import { useUI } from "@/app/providers";
@@ -44,9 +43,7 @@ type NavLinkIcon =
 export type NavLink = {
   label: string;
   href: string;
-
   match?: NavLinkMatch;
-
   icon?: NavLinkIcon;
 };
 
@@ -62,16 +59,17 @@ export type NavBarProps = {
 
 type CartButtonProps = {
   itemCount: number;
-
   isHydrated: boolean;
-
   isOpen: boolean;
-
   onClick: () => void;
-
   showLabel?: boolean;
-
   className?: string;
+};
+
+type MobileNavLinkProps = {
+  link: NavLink;
+  pathname: string;
+  onNavigate: () => void;
 };
 
 /* --------------------------------------------------------------------- */
@@ -81,52 +79,101 @@ type CartButtonProps = {
 const DEFAULT_LINKS:
   readonly NavLink[] = [
     {
-      label: "Home",
-      href: "/",
-      match: "exact",
-      icon: "home",
+      label:
+        "Home",
+
+      href:
+        "/",
+
+      match:
+        "exact",
+
+      icon:
+        "home",
     },
 
     {
-      label: "Artists",
-      href: "/artists",
-      match: "prefix",
-      icon: "artists",
+      label:
+        "Artists",
+
+      href:
+        "/artists",
+
+      match:
+        "prefix",
+
+      icon:
+        "artists",
     },
 
     {
-      label: "Releases",
-      href: "/releases",
-      match: "prefix",
-      icon: "releases",
+      label:
+        "Releases",
+
+      href:
+        "/releases",
+
+      match:
+        "prefix",
+
+      icon:
+        "releases",
     },
 
     {
-      label: "Distribution",
-      href: "/distribution",
-      match: "prefix",
-      icon: "distribution",
+      label:
+        "Marketing",
+
+      href:
+        "/services",
+
+      match:
+        "prefix",
+
+      icon:
+        "marketing",
     },
 
     {
-      label: "Marketing",
-      href: "/services",
-      match: "prefix",
-      icon: "marketing",
+      label:
+        "Distribution",
+
+      href:
+        "/distribution",
+
+      match:
+        "prefix",
+
+      icon:
+        "distribution",
     },
 
     {
-      label: "About",
-      href: "/about",
-      match: "prefix",
-      icon: "about",
+      label:
+        "About",
+
+      href:
+        "/about",
+
+      match:
+        "prefix",
+
+      icon:
+        "about",
     },
 
     {
-      label: "Contact",
-      href: "/contact",
-      match: "prefix",
-      icon: "contact",
+      label:
+        "Contact",
+
+      href:
+        "/contact",
+
+      match:
+        "prefix",
+
+      icon:
+        "contact",
     },
   ];
 
@@ -213,8 +260,8 @@ function ArrowIcon(): ReactNode {
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="17"
-      height="17"
+      width="16"
+      height="16"
       fill="none"
     >
       <path
@@ -451,39 +498,13 @@ function ContactIcon(): ReactNode {
   );
 }
 
-function SparkIcon(): ReactNode {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-    >
-      <path
-        d="M12 3L13.7 8.3L19 10L13.7 11.7L12 17L10.3 11.7L5 10L10.3 8.3L12 3Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-
-      <path
-        d="M18.5 15L19.2 17.3L21.5 18L19.2 18.7L18.5 21L17.8 18.7L15.5 18L17.8 17.3L18.5 15Z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function ShieldIcon(): ReactNode {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       fill="none"
     >
       <path
@@ -521,10 +542,31 @@ function joinClasses(
     .join(" ");
 }
 
+function normalizePathname(
+  pathname: string,
+): string {
+  if (
+    pathname.length > 1 &&
+    pathname.endsWith("/")
+  ) {
+    return pathname.replace(
+      /\/+$/,
+      "",
+    );
+  }
+
+  return pathname || "/";
+}
+
 function isLinkActive(
   pathname: string,
   link: NavLink,
 ): boolean {
+  const normalizedPathname =
+    normalizePathname(
+      pathname,
+    );
+
   const matchType =
     link.match ??
     "none";
@@ -536,28 +578,34 @@ function isLinkActive(
     return false;
   }
 
-  const route =
+  const hrefWithoutHash =
     link.href.split("#")[0] ||
     "/";
+
+  const route =
+    normalizePathname(
+      hrefWithoutHash,
+    );
 
   if (
     matchType ===
     "exact"
   ) {
-    return pathname ===
+    return normalizedPathname ===
       route;
   }
 
   if (
     route === "/"
   ) {
-    return pathname ===
+    return normalizedPathname ===
       "/";
   }
 
   return (
-    pathname === route ||
-    pathname.startsWith(
+    normalizedPathname ===
+      route ||
+    normalizedPathname.startsWith(
       `${route}/`,
     )
   );
@@ -567,15 +615,12 @@ function getVisibleCartCount(
   itemCount: number,
   isHydrated: boolean,
 ): number {
-  if (!isHydrated) {
-    return 0;
-  }
-
   if (
+    !isHydrated ||
     !Number.isFinite(
       itemCount,
     ) ||
-    itemCount < 0
+    itemCount <= 0
   ) {
     return 0;
   }
@@ -590,7 +635,9 @@ function getCartCountLabel(
 ): string {
   return itemCount > 99
     ? "99+"
-    : String(itemCount);
+    : String(
+        itemCount,
+      );
 }
 
 function getSelectedServiceLabel(
@@ -642,7 +689,8 @@ function CartButton({
   isHydrated,
   isOpen,
   onClick,
-  showLabel = true,
+  showLabel =
+    true,
   className,
 }: CartButtonProps) {
   const visibleCount =
@@ -664,11 +712,11 @@ function CartButton({
       ? "Close campaign cart"
       : !isHydrated
         ? "Open campaign cart"
-        : visibleCount === 0
-          ? "Open campaign cart. Your cart is empty."
-          : `Open campaign cart. ${visibleCount} selected ${getSelectedServiceLabel(
+        : hasItems
+          ? `Open campaign cart. ${visibleCount} selected ${getSelectedServiceLabel(
               visibleCount,
-            )}.`;
+            )}.`
+          : "Open campaign cart. Your cart is empty.";
 
   return (
     <button
@@ -680,13 +728,18 @@ function CartButton({
         isOpen
       }
       aria-haspopup="dialog"
-      onClick={onClick}
+      onClick={
+        onClick
+      }
       className={joinClasses(
         "group relative inline-flex h-11 items-center justify-center",
-        "rounded-full border transition duration-200",
-        "focus-visible:outline-none focus-visible:ring-2",
+        "rounded-full border",
+        "transition duration-200",
+        "focus-visible:outline-none",
+        "focus-visible:ring-2",
         "focus-visible:ring-[rgba(227,179,77,0.52)]",
-        "focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+        "focus-visible:ring-offset-2",
+        "focus-visible:ring-offset-black",
 
         isOpen
           ? [
@@ -720,8 +773,10 @@ function CartButton({
             className={[
               "absolute -right-2.5 -top-2.5",
               "grid min-h-5 min-w-5 place-items-center",
-              "rounded-full border border-black/70",
-              "bg-[var(--mr-gold-300)] px-1",
+              "rounded-full",
+              "border border-black/70",
+              "bg-[var(--mr-gold-300)]",
+              "px-1",
               "text-[8px] font-black leading-none text-black",
               "shadow-[0_5px_18px_rgba(0,0,0,0.45)]",
             ].join(" ")}
@@ -785,17 +840,20 @@ function DesktopNavLink({
 
   return (
     <Link
-      href={link.href}
-      className={joinClasses(
-        "mr-navlink",
-        active &&
-          "mr-navlink-active",
-      )}
+      href={
+        link.href
+      }
       aria-current={
         active
           ? "page"
           : undefined
       }
+      className={joinClasses(
+        "mr-navlink",
+
+        active &&
+          "mr-navlink-active",
+      )}
     >
       {link.label}
     </Link>
@@ -810,65 +868,91 @@ function MobileNavLink({
   link,
   pathname,
   onNavigate,
-}: {
-  link: NavLink;
-  pathname: string;
-  onNavigate: () => void;
-}) {
+}: MobileNavLinkProps) {
   const active =
     isLinkActive(
       pathname,
       link,
     );
 
-  const icon =
-    getMobileLinkIcon(
-      link,
-    );
-
   return (
     <Link
-      href={link.href}
+      href={
+        link.href
+      }
       onClick={
         onNavigate
       }
-      className={joinClasses(
-        "mr-mobile-link group",
-        active &&
-          "text-[var(--mr-gold-100)]",
-      )}
       aria-current={
         active
           ? "page"
           : undefined
       }
+      className={joinClasses(
+        "group relative flex min-h-14 items-center justify-between gap-4",
+        "rounded-[18px] border px-3.5 py-2.5",
+        "transition duration-200",
+        "focus-visible:outline-none",
+        "focus-visible:ring-2",
+        "focus-visible:ring-[rgba(227,179,77,0.48)]",
+
+        active
+          ? [
+              "border-[rgba(227,179,77,0.2)]",
+              "bg-[rgba(211,154,46,0.06)]",
+              "text-[var(--mr-gold-100)]",
+            ].join(" ")
+          : [
+              "border-transparent",
+              "bg-transparent",
+              "text-white/58",
+              "hover:border-white/[0.06]",
+              "hover:bg-white/[0.025]",
+              "hover:text-[var(--mr-gold-200)]",
+            ].join(" "),
+      )}
     >
+      {active ? (
+        <span
+          aria-hidden="true"
+          className={[
+            "absolute inset-y-3 left-0",
+            "w-[2px]",
+            "rounded-full",
+            "bg-[var(--mr-gold-300)]",
+            "shadow-[0_0_14px_rgba(227,179,77,0.45)]",
+          ].join(" ")}
+        />
+      ) : null}
+
       <span className="flex min-w-0 items-center gap-3">
         <span
           className={joinClasses(
-            "grid h-9 w-9 flex-[0_0_36px] place-items-center rounded-xl",
-            "border transition duration-200",
+            "grid h-9 w-9 flex-[0_0_36px] place-items-center",
+            "rounded-xl border",
+            "transition duration-200",
 
             active
               ? [
-                  "border-[rgba(227,179,77,0.3)]",
-                  "bg-[rgba(211,154,46,0.085)]",
+                  "border-[rgba(227,179,77,0.28)]",
+                  "bg-[rgba(211,154,46,0.08)]",
                   "text-[var(--mr-gold-200)]",
                 ].join(" ")
               : [
-                  "border-white/[0.075]",
-                  "bg-white/[0.025]",
-                  "text-white/40",
-                  "group-hover:border-[rgba(227,179,77,0.24)]",
-                  "group-hover:bg-[rgba(211,154,46,0.045)]",
+                  "border-white/[0.07]",
+                  "bg-white/[0.02]",
+                  "text-white/38",
+                  "group-hover:border-[rgba(227,179,77,0.2)]",
                   "group-hover:text-[var(--mr-gold-200)]",
                 ].join(" "),
           )}
         >
-          {icon}
+          {getMobileLinkIcon(
+            link,
+          )}
         </span>
 
-        <span className="truncate">
+        <span className="truncate text-sm font-black tracking-[-0.01em]">
           {link.label}
         </span>
       </span>
@@ -876,11 +960,16 @@ function MobileNavLink({
       <span
         aria-hidden="true"
         className={joinClasses(
-          "transition duration-200 group-hover:translate-x-0.5",
+          "flex-[0_0_auto]",
+          "transition duration-200",
 
           active
             ? "text-[var(--mr-gold-200)]"
-            : "text-white/35 group-hover:text-[var(--mr-gold-200)]",
+            : [
+                "text-white/20",
+                "group-hover:translate-x-0.5",
+                "group-hover:text-[var(--mr-gold-200)]",
+              ].join(" "),
         )}
       >
         <ArrowIcon />
@@ -890,73 +979,66 @@ function MobileNavLink({
 }
 
 /* --------------------------------------------------------------------- */
-/* Mobile Feature Card                                                    */
+/* Mobile Utility Link                                                    */
 /* --------------------------------------------------------------------- */
 
-function MobileFeatureCard({
+function MobileUtilityLink({
   href,
   eyebrow,
-  title,
-  description,
+  label,
   icon,
   onClick,
 }: {
   href: string;
   eyebrow: string;
-  title: string;
-  description: string;
+  label: string;
   icon: ReactNode;
   onClick: () => void;
 }) {
   return (
     <Link
-      href={href}
-      onClick={onClick}
+      href={
+        href
+      }
+      onClick={
+        onClick
+      }
       className={[
-        "group relative block overflow-hidden rounded-[22px]",
-        "border border-[rgba(227,179,77,0.18)]",
-        "bg-[linear-gradient(135deg,rgba(211,154,46,0.065),rgba(255,255,255,0.018))]",
-        "p-5 transition duration-200",
-        "hover:border-[rgba(227,179,77,0.32)]",
-        "hover:bg-[rgba(211,154,46,0.085)]",
+        "group flex min-h-14 items-center justify-between gap-3",
+        "rounded-[18px]",
+        "border border-white/[0.06]",
+        "bg-white/[0.02]",
+        "px-4 py-3",
+        "transition duration-200",
+        "hover:border-[rgba(227,179,77,0.18)]",
+        "hover:bg-[rgba(211,154,46,0.035)]",
         "focus-visible:outline-none",
         "focus-visible:ring-2",
-        "focus-visible:ring-[rgba(227,179,77,0.5)]",
+        "focus-visible:ring-[rgba(227,179,77,0.45)]",
       ].join(" ")}
     >
-      <div
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="grid h-9 w-9 flex-[0_0_36px] place-items-center rounded-xl border border-[rgba(227,179,77,0.15)] bg-[rgba(211,154,46,0.035)] text-[var(--mr-gold-200)]">
+          {icon}
+        </span>
+
+        <span className="min-w-0">
+          <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-white/25">
+            {eyebrow}
+          </span>
+
+          <span className="mt-1 block truncate text-xs font-black text-white/62">
+            {label}
+          </span>
+        </span>
+      </span>
+
+      <span
         aria-hidden="true"
-        className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-[rgba(227,179,77,0.085)] blur-[70px]"
-      />
-
-      <div className="relative flex items-center justify-between gap-5">
-        <span className="flex min-w-0 items-center gap-4">
-          <span className="grid h-12 w-12 flex-[0_0_48px] place-items-center rounded-2xl border border-[rgba(227,179,77,0.24)] bg-black/20 text-[var(--mr-gold-200)]">
-            {icon}
-          </span>
-
-          <span className="min-w-0">
-            <span className="block text-[9px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)]">
-              {eyebrow}
-            </span>
-
-            <span className="mt-1 block truncate text-sm font-black text-[var(--mr-text)]">
-              {title}
-            </span>
-
-            <span className="mt-1 block text-[10px] leading-5 text-white/38">
-              {description}
-            </span>
-          </span>
-        </span>
-
-        <span
-          aria-hidden="true"
-          className="flex-[0_0_auto] text-[var(--mr-gold-200)] transition-transform duration-200 group-hover:translate-x-1"
-        >
-          <ArrowIcon />
-        </span>
-      </div>
+        className="text-[var(--mr-gold-200)] transition-transform duration-200 group-hover:translate-x-0.5"
+      >
+        <ArrowIcon />
+      </span>
     </Link>
   );
 }
@@ -966,13 +1048,20 @@ function MobileFeatureCard({
 /* --------------------------------------------------------------------- */
 
 export default function NavBar({
-  links = DEFAULT_LINKS,
+  links =
+    DEFAULT_LINKS,
 
-  ctaPrimaryHref = "/services",
-  ctaPrimaryLabel = "Start a Campaign",
+  ctaPrimaryHref =
+    "/services",
 
-  ctaSecondaryHref = "/submit-music",
-  ctaSecondaryLabel = "Submit Music",
+  ctaPrimaryLabel =
+    "Start a Campaign",
+
+  ctaSecondaryHref =
+    "/submit-music",
+
+  ctaSecondaryLabel =
+    "Submit Music",
 }: NavBarProps) {
   const pathname =
     usePathname();
@@ -985,7 +1074,6 @@ export default function NavBar({
     closeMobileMenu,
 
     toggleCart,
-    openCart,
   } =
     useUI();
 
@@ -994,23 +1082,6 @@ export default function NavBar({
     isHydrated,
   } =
     useCart();
-
-  const visibleCartCount =
-    getVisibleCartCount(
-      itemCount,
-      isHydrated,
-    );
-
-  /* ------------------------------------------------------------------- */
-  /* Route Change Cleanup                                                */
-  /* ------------------------------------------------------------------- */
-
-  useEffect(() => {
-    closeMobileMenu();
-  }, [
-    pathname,
-    closeMobileMenu,
-  ]);
 
   /* ------------------------------------------------------------------- */
   /* Render                                                              */
@@ -1031,10 +1102,10 @@ export default function NavBar({
           <Link
             href="/"
             aria-label="Money Records homepage"
-            className="mr-brand group min-w-0"
             onClick={
               closeMobileMenu
             }
+            className="mr-brand group min-w-0"
           >
             <span className="mr-brand-mark relative flex-[0_0_auto] overflow-hidden">
               <Image
@@ -1072,10 +1143,14 @@ export default function NavBar({
             className="mr-nav hidden 2xl:flex"
           >
             {links.map(
-              (link) => (
+              (
+                link,
+              ) => (
                 <DesktopNavLink
                   key={`${link.label}-${link.href}`}
-                  link={link}
+                  link={
+                    link
+                  }
                   pathname={
                     pathname
                   }
@@ -1151,13 +1226,13 @@ export default function NavBar({
               href={
                 ctaPrimaryHref
               }
+              className="hidden lg:inline-flex"
             >
               {ctaPrimaryLabel}
             </Button>
 
             <button
               type="button"
-              className="mr-btn-dark mr-btn-square"
               aria-label={
                 isMobileMenuOpen
                   ? "Close navigation menu"
@@ -1170,6 +1245,15 @@ export default function NavBar({
               onClick={
                 toggleMobileMenu
               }
+              className={joinClasses(
+                "mr-btn-dark mr-btn-square",
+
+                isMobileMenuOpen &&
+                  [
+                    "border-[rgba(227,179,77,0.3)]",
+                    "text-[var(--mr-gold-200)]",
+                  ].join(" "),
+              )}
             >
               {isMobileMenuOpen
                 ? <CloseIcon />
@@ -1202,7 +1286,6 @@ export default function NavBar({
 
             <button
               type="button"
-              className="mr-btn-dark mr-btn-square"
               aria-label={
                 isMobileMenuOpen
                   ? "Close navigation menu"
@@ -1215,6 +1298,15 @@ export default function NavBar({
               onClick={
                 toggleMobileMenu
               }
+              className={joinClasses(
+                "mr-btn-dark mr-btn-square",
+
+                isMobileMenuOpen &&
+                  [
+                    "border-[rgba(227,179,77,0.3)]",
+                    "text-[var(--mr-gold-200)]",
+                  ].join(" "),
+              )}
             >
               {isMobileMenuOpen
                 ? <CloseIcon />
@@ -1237,17 +1329,17 @@ export default function NavBar({
           <button
             type="button"
             aria-label="Close navigation menu"
-            className={[
-              "fixed inset-0",
-              "top-[var(--mr-header-height)]",
-              "z-[80]",
-              "bg-black/80",
-              "backdrop-blur-[8px]",
-              "2xl:hidden",
-            ].join(" ")}
             onClick={
               closeMobileMenu
             }
+            className={[
+              "fixed inset-x-0 bottom-0",
+              "top-[var(--mr-header-height)]",
+              "z-[80]",
+              "bg-black/78",
+              "backdrop-blur-[8px]",
+              "2xl:hidden",
+            ].join(" ")}
           />
 
           {/* ----------------------------------------------------------- */}
@@ -1256,382 +1348,196 @@ export default function NavBar({
 
           <div
             id="money-records-mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Money Records navigation"
             className={[
-              "mr-mobile-menu fixed inset-x-0",
+              "mr-mobile-menu",
+              "fixed inset-x-0",
               "top-[var(--mr-header-height)]",
               "z-[90]",
               "max-h-[calc(100dvh-var(--mr-header-height))]",
-              "overflow-y-auto overscroll-contain",
+              "overflow-y-auto",
+              "overscroll-contain",
+              "border-t border-white/[0.055]",
+              "shadow-[0_34px_90px_rgba(0,0,0,0.65)]",
               "2xl:hidden",
             ].join(" ")}
           >
             <Container>
-              {/* ------------------------------------------------------- */}
-              {/* Menu Header                                             */}
-              {/* ------------------------------------------------------- */}
+              <div
+                className={[
+                  "py-4",
+                  "pb-[max(18px,env(safe-area-inset-bottom))]",
+                  "sm:py-5",
+                ].join(" ")}
+              >
+                {/* ----------------------------------------------------- */}
+                {/* Compact Header                                        */}
+                {/* ----------------------------------------------------- */}
 
-              <div className="border-b border-white/[0.07] py-5">
-                <div className="flex items-center justify-between gap-5">
-                  <div>
-                    <p className="m-0 text-[9px] font-black uppercase tracking-[0.18em] text-[var(--mr-gold-200)]">
+                <div className="flex items-center justify-between gap-4 border-b border-white/[0.065] pb-4">
+                  <div className="min-w-0">
+                    <p className="m-0 text-[8px] font-black uppercase tracking-[0.18em] text-[var(--mr-gold-200)]">
                       Money Records
                     </p>
 
-                    <p className="mt-1 text-sm font-black text-[var(--mr-text)]">
+                    <p className="mt-1 truncate text-sm font-black text-[var(--mr-text)]">
                       Explore the Label
                     </p>
                   </div>
 
-                  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.04] px-3 py-2 text-[8px] font-black uppercase tracking-[0.14em] text-emerald-300/80">
+                  <span
+                    className={[
+                      "inline-flex flex-[0_0_auto] items-center gap-2",
+                      "rounded-full",
+                      "border border-emerald-300/15",
+                      "bg-emerald-300/[0.04]",
+                      "px-3 py-2",
+                      "text-[8px] font-black uppercase",
+                      "tracking-[0.14em]",
+                      "text-emerald-300/80",
+                    ].join(" ")}
+                  >
                     <span
                       aria-hidden="true"
-                      className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.75)]"
+                      className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.65)]"
                     />
 
                     Online
                   </span>
                 </div>
-              </div>
 
-              {/* ------------------------------------------------------- */}
-              {/* Campaign Cart Shortcut                                  */}
-              {/* ------------------------------------------------------- */}
+                {/* ----------------------------------------------------- */}
+                {/* Main Navigation                                       */}
+                {/* ----------------------------------------------------- */}
 
-              <div className="border-b border-white/[0.07] py-4">
-                <button
-                  type="button"
-                  aria-label={
-                    isHydrated
-                      ? `Open campaign cart with ${visibleCartCount} selected ${getSelectedServiceLabel(
-                          visibleCartCount,
-                        )}`
-                      : "Open campaign cart"
-                  }
-                  aria-haspopup="dialog"
-                  aria-expanded={
-                    isCartOpen
-                  }
-                  onClick={
-                    openCart
-                  }
-                  className={[
-                    "group flex w-full items-center justify-between gap-4",
-                    "rounded-[22px]",
-                    "border border-[rgba(227,179,77,0.2)]",
-                    "bg-[linear-gradient(135deg,rgba(211,154,46,0.065),rgba(255,255,255,0.018))]",
-                    "p-4 text-left",
-                    "transition duration-200",
-                    "hover:border-[rgba(227,179,77,0.34)]",
-                    "hover:bg-[rgba(211,154,46,0.085)]",
-                    "focus-visible:outline-none",
-                    "focus-visible:ring-2",
-                    "focus-visible:ring-[rgba(227,179,77,0.5)]",
-                  ].join(" ")}
+                <nav
+                  aria-label="Mobile navigation"
+                  className="py-4"
                 >
-                  <span className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-11 w-11 flex-[0_0_44px] place-items-center rounded-xl border border-[rgba(227,179,77,0.22)] bg-[rgba(211,154,46,0.06)] text-[var(--mr-gold-200)]">
-                      <CartIcon />
-                    </span>
+                  <div className="mb-2 px-1">
+                    <p className="m-0 text-[8px] font-black uppercase tracking-[0.17em] text-white/24">
+                      Navigation
+                    </p>
+                  </div>
 
-                    <span className="min-w-0">
-                      <span className="block text-[9px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)]">
-                        Campaign Cart
-                      </span>
+                  <div className="grid gap-1 sm:grid-cols-2">
+                    {links.map(
+                      (
+                        link,
+                      ) => (
+                        <MobileNavLink
+                          key={`mobile-${link.label}-${link.href}`}
+                          link={
+                            link
+                          }
+                          pathname={
+                            pathname
+                          }
+                          onNavigate={
+                            closeMobileMenu
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                </nav>
 
-                      <span
-                        aria-live="polite"
-                        className="mt-1 block truncate text-sm font-black text-[var(--mr-text)]"
-                      >
-                        {isHydrated
-                          ? `${visibleCartCount} selected ${getSelectedServiceLabel(
-                              visibleCartCount,
-                            )}`
-                          : "Loading selected services"}
-                      </span>
-                    </span>
-                  </span>
+                {/* ----------------------------------------------------- */}
+                {/* Primary Actions                                       */}
+                {/* ----------------------------------------------------- */}
 
-                  <span className="flex items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className={joinClasses(
-                        "grid min-h-8 min-w-8 place-items-center rounded-full px-2",
-                        "text-[10px] font-black",
+                <div className="border-t border-white/[0.065] py-4">
+                  <div className="mb-3 px-1">
+                    <p className="m-0 text-[8px] font-black uppercase tracking-[0.17em] text-white/24">
+                      Artist Actions
+                    </p>
+                  </div>
 
-                        isHydrated &&
-                        visibleCartCount > 0
-                          ? "bg-[var(--mr-gold-300)] text-black"
-                          : "border border-white/[0.08] bg-white/[0.035] text-white/40",
-                      )}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Button
+                      variant="primary"
+                      href={
+                        ctaPrimaryHref
+                      }
+                      onClick={
+                        closeMobileMenu
+                      }
+                      className="w-full"
                     >
-                      {isHydrated
-                        ? getCartCountLabel(
-                            visibleCartCount,
-                          )
-                        : "—"}
-                    </span>
+                      {ctaPrimaryLabel}
+                    </Button>
 
-                    <span
-                      aria-hidden="true"
-                      className="text-[var(--mr-gold-200)] transition-transform duration-200 group-hover:translate-x-0.5"
+                    <Button
+                      variant="secondary"
+                      href={
+                        ctaSecondaryHref
+                      }
+                      onClick={
+                        closeMobileMenu
+                      }
+                      className="w-full"
                     >
-                      <ArrowIcon />
-                    </span>
-                  </span>
-                </button>
-              </div>
-
-              {/* ------------------------------------------------------- */}
-              {/* Navigation Links                                        */}
-              {/* ------------------------------------------------------- */}
-
-              <nav
-                aria-label="Mobile navigation"
-                className="py-4"
-              >
-                <div className="mb-3 px-1">
-                  <p className="m-0 text-[8px] font-black uppercase tracking-[0.17em] text-white/25">
-                    Main Navigation
-                  </p>
+                      {ctaSecondaryLabel}
+                    </Button>
+                  </div>
                 </div>
 
-                {links.map(
-                  (link) => (
-                    <MobileNavLink
-                      key={`mobile-${link.label}-${link.href}`}
-                      link={link}
-                      pathname={
-                        pathname
+                {/* ----------------------------------------------------- */}
+                {/* Quick Help                                            */}
+                {/* ----------------------------------------------------- */}
+
+                <div className="border-t border-white/[0.065] py-4">
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <MobileUtilityLink
+                      href="/contact"
+                      eyebrow="Need Help?"
+                      label="Contact the Team"
+                      icon={
+                        <ContactIcon />
                       }
-                      onNavigate={
+                      onClick={
                         closeMobileMenu
                       }
                     />
-                  ),
-                )}
-              </nav>
 
-              {/* ------------------------------------------------------- */}
-              {/* Featured Routes                                         */}
-              {/* ------------------------------------------------------- */}
-
-              <div className="grid gap-3 border-t border-white/[0.07] py-5 md:grid-cols-2">
-                <MobileFeatureCard
-                  href="/artists"
-                  eyebrow="Money Records Roster"
-                  title="Discover Our Artists"
-                  description="Profiles, biographies, official releases, and artist links."
-                  icon={
-                    <ArtistIcon />
-                  }
-                  onClick={
-                    closeMobileMenu
-                  }
-                />
-
-                <MobileFeatureCard
-                  href="/releases"
-                  eyebrow="Official Catalog"
-                  title="Explore Releases"
-                  description="Artwork, release details, streaming destinations, and music."
-                  icon={
-                    <MusicIcon />
-                  }
-                  onClick={
-                    closeMobileMenu
-                  }
-                />
-              </div>
-
-              {/* ------------------------------------------------------- */}
-              {/* Artist Submission Highlight                             */}
-              {/* ------------------------------------------------------- */}
-
-              <div className="border-t border-white/[0.07] py-5">
-                <Link
-                  href="/submit-music"
-                  onClick={
-                    closeMobileMenu
-                  }
-                  className={[
-                    "group relative block overflow-hidden rounded-[24px]",
-                    "border border-[rgba(227,179,77,0.24)]",
-                    "bg-[linear-gradient(135deg,rgba(211,154,46,0.1),rgba(255,255,255,0.02))]",
-                    "p-5 transition duration-200",
-                    "hover:border-[rgba(227,179,77,0.4)]",
-                    "hover:bg-[rgba(211,154,46,0.12)]",
-                    "focus-visible:outline-none",
-                    "focus-visible:ring-2",
-                    "focus-visible:ring-[rgba(227,179,77,0.5)]",
-                  ].join(" ")}
-                >
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[rgba(227,179,77,0.13)] blur-[75px]"
-                  />
-
-                  <div className="relative flex items-center justify-between gap-5">
-                    <span className="flex min-w-0 items-center gap-4">
-                      <span className="grid h-13 w-13 flex-[0_0_52px] place-items-center rounded-[18px] border border-[rgba(227,179,77,0.28)] bg-black/20 text-[var(--mr-gold-200)]">
-                        <SparkIcon />
-                      </span>
-
-                      <span className="min-w-0">
-                        <span className="block text-[9px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)]">
-                          Artist Submissions
-                        </span>
-
-                        <span className="mt-1 block text-base font-black tracking-[-0.02em] text-[var(--mr-text)]">
-                          Submit Your Music
-                        </span>
-
-                        <span className="mt-1 block text-[10px] leading-5 text-white/40">
-                          Send your strongest record, artist story, links,
-                          release details, and goals.
-                        </span>
-                      </span>
-                    </span>
-
-                    <span
-                      aria-hidden="true"
-                      className="flex-[0_0_auto] text-[var(--mr-gold-200)] transition-transform duration-200 group-hover:translate-x-1"
-                    >
-                      <ArrowIcon />
-                    </span>
-                  </div>
-                </Link>
-              </div>
-
-              {/* ------------------------------------------------------- */}
-              {/* Mobile CTAs                                             */}
-              {/* ------------------------------------------------------- */}
-
-              <div className="grid gap-3 border-t border-white/[0.07] py-5 sm:grid-cols-2">
-                <Button
-                  variant="primary"
-                  href={
-                    ctaPrimaryHref
-                  }
-                  onClick={
-                    closeMobileMenu
-                  }
-                  className="w-full"
-                >
-                  {ctaPrimaryLabel}
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  href={
-                    ctaSecondaryHref
-                  }
-                  onClick={
-                    closeMobileMenu
-                  }
-                  className="w-full"
-                >
-                  {ctaSecondaryLabel}
-                </Button>
-              </div>
-
-              {/* ------------------------------------------------------- */}
-              {/* Quick Contact                                           */}
-              {/* ------------------------------------------------------- */}
-
-              <div className="border-t border-white/[0.07] py-5">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Link
-                    href="/contact"
-                    onClick={
-                      closeMobileMenu
-                    }
-                    className={[
-                      "group flex items-center justify-between gap-4 rounded-[18px]",
-                      "border border-white/[0.065] bg-white/[0.022] p-4",
-                      "transition duration-200",
-                      "hover:border-[rgba(227,179,77,0.2)]",
-                      "hover:bg-[rgba(211,154,46,0.035)]",
-                    ].join(" ")}
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="text-[var(--mr-gold-200)]">
-                        <ContactIcon />
-                      </span>
-
-                      <span>
-                        <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-white/25">
-                          Questions?
-                        </span>
-
-                        <span className="mt-1 block text-xs font-black text-white/58">
-                          Contact the Team
-                        </span>
-                      </span>
-                    </span>
-
-                    <span className="text-[var(--mr-gold-200)]">
-                      <ArrowIcon />
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/distribution"
-                    onClick={
-                      closeMobileMenu
-                    }
-                    className={[
-                      "group flex items-center justify-between gap-4 rounded-[18px]",
-                      "border border-white/[0.065] bg-white/[0.022] p-4",
-                      "transition duration-200",
-                      "hover:border-[rgba(227,179,77,0.2)]",
-                      "hover:bg-[rgba(211,154,46,0.035)]",
-                    ].join(" ")}
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="text-[var(--mr-gold-200)]">
+                    <MobileUtilityLink
+                      href="/distribution"
+                      eyebrow="Release Support"
+                      label="Music Distribution"
+                      icon={
                         <GlobeIcon />
-                      </span>
-
-                      <span>
-                        <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-white/25">
-                          Release Support
-                        </span>
-
-                        <span className="mt-1 block text-xs font-black text-white/58">
-                          Music Distribution
-                        </span>
-                      </span>
-                    </span>
-
-                    <span className="text-[var(--mr-gold-200)]">
-                      <ArrowIcon />
-                    </span>
-                  </Link>
+                      }
+                      onClick={
+                        closeMobileMenu
+                      }
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* ------------------------------------------------------- */}
-              {/* Footer Status                                           */}
-              {/* ------------------------------------------------------- */}
+                {/* ----------------------------------------------------- */}
+                {/* Footer                                                */}
+                {/* ----------------------------------------------------- */}
 
-              <div className="border-t border-white/[0.07] py-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3 border-t border-white/[0.065] pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2.5">
                     <span
                       aria-hidden="true"
                       className={[
-                        "h-2 w-2 rounded-full",
+                        "h-1.5 w-1.5",
+                        "rounded-full",
                         "bg-[var(--mr-gold-300)]",
-                        "shadow-[0_0_18px_rgba(239,202,112,0.65)]",
+                        "shadow-[0_0_14px_rgba(239,202,112,0.55)]",
                       ].join(" ")}
                     />
 
-                    <p className="m-0 text-[9px] font-bold uppercase tracking-[0.16em] text-white/40">
+                    <p className="m-0 text-[8px] font-bold uppercase tracking-[0.15em] text-white/32">
                       Independent Artists · Global Execution
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-white/24">
+                  <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-white/22">
                     <ShieldIcon />
 
                     Money Records LLC

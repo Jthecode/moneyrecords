@@ -8,7 +8,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+
+import type {
+  ReactNode,
+} from "react";
 
 import Button from "@/components/Button";
 import Container from "@/components/Container";
@@ -39,7 +42,8 @@ type FooterLink = {
 
 type FooterGroup = {
   title: string;
-  links: readonly FooterLink[];
+  links:
+    readonly FooterLink[];
 };
 
 type QuickLinkProps = {
@@ -50,6 +54,11 @@ type QuickLinkProps = {
   icon: ReactNode;
 };
 
+type MobileAccordionProps = {
+  title: string;
+  children: ReactNode;
+};
+
 /* --------------------------------------------------------------------- */
 /* Footer Navigation                                                      */
 /* --------------------------------------------------------------------- */
@@ -57,71 +66,121 @@ type QuickLinkProps = {
 const footerGroups:
   readonly FooterGroup[] = [
     {
-      title: "Explore",
+      title:
+        "Explore",
 
       links: [
         {
-          label: "Home",
-          href: "/",
+          label:
+            "Home",
+
+          href:
+            "/",
         },
+
         {
-          label: "Artists",
-          href: "/artists",
+          label:
+            "Artists",
+
+          href:
+            "/artists",
         },
+
         {
-          label: "Releases",
-          href: "/releases",
+          label:
+            "Releases",
+
+          href:
+            "/releases",
         },
+
         {
-          label: "About Money Records",
-          href: "/about",
+          label:
+            "About Money Records",
+
+          href:
+            "/about",
         },
       ],
     },
 
     {
-      title: "Services",
+      title:
+        "Services",
 
       links: [
         {
-          label: "Marketing Services",
-          href: "/services",
+          label:
+            "Marketing Services",
+
+          href:
+            "/services",
         },
+
         {
-          label: "Music Distribution",
-          href: "/distribution",
+          label:
+            "Music Distribution",
+
+          href:
+            "/distribution",
         },
+
         {
-          label: "Submit Music",
-          href: "/submit-music",
+          label:
+            "Submit Music",
+
+          href:
+            "/submit-music",
         },
+
         {
-          label: "Contact the Team",
-          href: "/contact",
+          label:
+            "Contact the Team",
+
+          href:
+            "/contact",
         },
       ],
     },
 
     {
-      title: "Support",
+      title:
+        "Support",
 
       links: [
         {
-          label: "General Inquiry",
-          href: "/contact",
+          label:
+            "General Inquiry",
+
+          href:
+            "/contact",
         },
+
         {
-          label: "Refund Policy",
-          href: "/refund-policy",
+          label:
+            "Refund Policy",
+
+          href:
+            "/refund-policy",
         },
+
         {
-          label: "Marketing Disclaimer",
-          href: "/marketing-disclaimer",
+          label:
+            "Marketing Disclaimer",
+
+          href:
+            "/marketing-disclaimer",
         },
+
         {
-          label: "Email Money Records",
-          href: `mailto:${CONTACT_EMAIL}`,
-          external: true,
+          label:
+            "Email Money Records",
+
+          href:
+            `mailto:${CONTACT_EMAIL}`,
+
+          external:
+            true,
         },
       ],
     },
@@ -152,20 +211,35 @@ const platformLabels:
 const legalLinks:
   readonly FooterLink[] = [
     {
-      label: "Privacy",
-      href: "/privacy",
+      label:
+        "Privacy",
+
+      href:
+        "/privacy",
     },
+
     {
-      label: "Terms",
-      href: "/terms",
+      label:
+        "Terms",
+
+      href:
+        "/terms",
     },
+
     {
-      label: "Refund Policy",
-      href: "/refund-policy",
+      label:
+        "Refund Policy",
+
+      href:
+        "/refund-policy",
     },
+
     {
-      label: "Marketing Disclaimer",
-      href: "/marketing-disclaimer",
+      label:
+        "Marketing Disclaimer",
+
+      href:
+        "/marketing-disclaimer",
     },
   ];
 
@@ -204,6 +278,26 @@ function ArrowUpRightIcon(): ReactNode {
     >
       <path
         d="M7 17L17 7M8 7H17V16"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronIcon(): ReactNode {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="17"
+      height="17"
+      fill="none"
+    >
+      <path
+        d="M6 9L12 15L18 9"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
@@ -453,6 +547,23 @@ function CheckIcon(): ReactNode {
 }
 
 /* --------------------------------------------------------------------- */
+/* Helpers                                                                */
+/* --------------------------------------------------------------------- */
+
+function joinClasses(
+  ...classes: Array<
+    string |
+    false |
+    null |
+    undefined
+  >
+): string {
+  return classes
+    .filter(Boolean)
+    .join(" ");
+}
+
+/* --------------------------------------------------------------------- */
 /* Footer Navigation Link                                                 */
 /* --------------------------------------------------------------------- */
 
@@ -483,8 +594,12 @@ function FooterNavigationLink({
 
     return (
       <a
-        className={className}
-        href={link.href}
+        className={
+          className
+        }
+        href={
+          link.href
+        }
         target={
           isHttpLink
             ? "_blank"
@@ -518,8 +633,12 @@ function FooterNavigationLink({
 
   return (
     <Link
-      className={className}
-      href={link.href}
+      className={
+        className
+      }
+      href={
+        link.href
+      }
     >
       <span>
         {link.label}
@@ -542,6 +661,91 @@ function FooterNavigationLink({
 }
 
 /* --------------------------------------------------------------------- */
+/* Mobile Footer Navigation Link                                          */
+/* --------------------------------------------------------------------- */
+
+function MobileFooterLink({
+  link,
+}: {
+  link: FooterLink;
+}) {
+  const content = (
+    <>
+      <span className="truncate">
+        {link.label}
+      </span>
+
+      <span
+        aria-hidden="true"
+        className="flex-[0_0_auto] text-white/20"
+      >
+        <ArrowUpRightIcon />
+      </span>
+    </>
+  );
+
+  const className = [
+    "flex min-h-12 items-center justify-between gap-3",
+    "border-b border-white/[0.05]",
+    "py-2.5",
+    "text-sm font-semibold text-white/50",
+    "transition-colors duration-200",
+    "last:border-b-0",
+    "hover:text-[var(--mr-gold-200)]",
+    "focus-visible:outline-none",
+    "focus-visible:text-[var(--mr-gold-200)]",
+  ].join(" ");
+
+  if (
+    link.external
+  ) {
+    const isHttpLink =
+      link.href.startsWith(
+        "http://",
+      ) ||
+      link.href.startsWith(
+        "https://",
+      );
+
+    return (
+      <a
+        href={
+          link.href
+        }
+        target={
+          isHttpLink
+            ? "_blank"
+            : undefined
+        }
+        rel={
+          isHttpLink
+            ? "noopener noreferrer"
+            : undefined
+        }
+        className={
+          className
+        }
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={
+        link.href
+      }
+      className={
+        className
+      }
+    >
+      {content}
+    </Link>
+  );
+}
+
+/* --------------------------------------------------------------------- */
 /* Quick Link                                                             */
 /* --------------------------------------------------------------------- */
 
@@ -554,7 +758,9 @@ function QuickLink({
 }: QuickLinkProps) {
   return (
     <Link
-      href={href}
+      href={
+        href
+      }
       className={[
         "group relative overflow-hidden rounded-[22px]",
         "border border-white/[0.065]",
@@ -630,6 +836,183 @@ function PlatformBadge({
 }
 
 /* --------------------------------------------------------------------- */
+/* Mobile Accordion                                                       */
+/* --------------------------------------------------------------------- */
+
+function MobileAccordion({
+  title,
+  children,
+}: MobileAccordionProps) {
+  return (
+    <details
+      className={[
+        "group overflow-hidden",
+        "border-b border-white/[0.065]",
+        "last:border-b-0",
+      ].join(" ")}
+    >
+      <summary
+        className={[
+          "flex min-h-14 cursor-pointer list-none",
+          "items-center justify-between gap-4",
+          "py-3",
+          "text-left",
+          "[&::-webkit-details-marker]:hidden",
+          "focus-visible:outline-none",
+        ].join(" ")}
+      >
+        <span className="text-[10px] font-black uppercase tracking-[0.17em] text-white/55 transition-colors group-open:text-[var(--mr-gold-200)]">
+          {title}
+        </span>
+
+        <span
+          aria-hidden="true"
+          className={[
+            "grid h-8 w-8 place-items-center",
+            "rounded-full",
+            "border border-white/[0.065]",
+            "bg-white/[0.02]",
+            "text-white/30",
+            "transition duration-200",
+            "group-open:rotate-180",
+            "group-open:border-[rgba(227,179,77,0.18)]",
+            "group-open:text-[var(--mr-gold-200)]",
+          ].join(" ")}
+        >
+          <ChevronIcon />
+        </span>
+      </summary>
+
+      <div className="pb-4">
+        {children}
+      </div>
+    </details>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Footer Brand                                                           */
+/* --------------------------------------------------------------------- */
+
+function FooterBrand() {
+  return (
+    <div>
+      <Link
+        href="/"
+        aria-label="Money Records homepage"
+        className="group inline-flex max-w-full items-center gap-3 sm:gap-4"
+      >
+        <span className="mr-brand-mark relative h-12 w-12 flex-[0_0_48px] overflow-hidden sm:h-14 sm:w-14 sm:flex-basis-[56px]">
+          <Image
+            src="/brand/mr-crest.png"
+            alt=""
+            width={64}
+            height={64}
+            sizes="56px"
+            className={[
+              "h-full w-full object-contain p-1.5",
+              "transition-transform duration-500",
+              "group-hover:scale-105",
+            ].join(" ")}
+          />
+        </span>
+
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate text-sm font-black uppercase tracking-[0.16em] text-[var(--mr-text)] sm:text-base sm:tracking-[0.18em]">
+            Money Records
+          </span>
+
+          <span className="mt-1.5 truncate text-[8px] font-bold uppercase tracking-[0.2em] text-white/34 sm:mt-2 sm:text-[9px] sm:tracking-[0.24em]">
+            Record Label · Global Marketing
+          </span>
+        </span>
+      </Link>
+
+      <p className="mt-5 max-w-md text-sm leading-7 text-white/46">
+        An independent record label and music company connecting
+        artist development, releases, distribution, marketing,
+        branding, press, video, radio, and release strategy.
+      </p>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.035] px-3 py-2 text-[8px] font-black uppercase tracking-[0.13em] text-emerald-300/75">
+          <span
+            aria-hidden="true"
+            className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.75)]"
+          />
+
+          Artist Submissions Open
+        </span>
+
+        <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(227,179,77,0.14)] bg-[rgba(211,154,46,0.035)] px-3 py-2 text-[8px] font-black uppercase tracking-[0.13em] text-[var(--mr-gold-200)]">
+          Independent Since 2019
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* Contact Links                                                          */
+/* --------------------------------------------------------------------- */
+
+function FooterContact() {
+  return (
+    <div className="grid gap-2">
+      <a
+        href={`mailto:${CONTACT_EMAIL}`}
+        className={[
+          "group flex min-h-12 items-center gap-3",
+          "rounded-[16px]",
+          "border border-white/[0.055]",
+          "bg-white/[0.018]",
+          "px-3.5",
+          "text-sm text-white/58",
+          "transition duration-200",
+          "hover:border-[rgba(227,179,77,0.18)]",
+          "hover:text-[var(--mr-gold-100)]",
+        ].join(" ")}
+      >
+        <span className="mr-icon-ring h-9 w-9 flex-[0_0_36px]">
+          <MailIcon />
+        </span>
+
+        <span className="min-w-0 truncate">
+          {CONTACT_EMAIL}
+        </span>
+      </a>
+
+      <a
+        href={
+          INSTAGRAM_URL
+        }
+        target="_blank"
+        rel="noopener noreferrer"
+        className={[
+          "group flex min-h-12 items-center gap-3",
+          "rounded-[16px]",
+          "border border-white/[0.055]",
+          "bg-white/[0.018]",
+          "px-3.5",
+          "text-sm text-white/58",
+          "transition duration-200",
+          "hover:border-[rgba(227,179,77,0.18)]",
+          "hover:text-[var(--mr-gold-100)]",
+        ].join(" ")}
+      >
+        <span className="mr-icon-ring h-9 w-9 flex-[0_0_36px]">
+          <InstagramIcon />
+        </span>
+
+        <span className="min-w-0 truncate">
+          {INSTAGRAM_HANDLE}
+        </span>
+      </a>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
 /* Footer                                                                 */
 /* --------------------------------------------------------------------- */
 
@@ -641,8 +1024,19 @@ export default function Footer() {
   return (
     <footer
       aria-labelledby="money-records-footer-heading"
-      className="relative mt-20 overflow-hidden border-t border-white/[0.06]"
+      className={[
+        "relative overflow-hidden",
+        "border-t border-white/[0.06]",
+        "mt-14 sm:mt-16 lg:mt-20",
+      ].join(" ")}
     >
+      <h2
+        id="money-records-footer-heading"
+        className="sr-only"
+      >
+        Money Records Footer
+      </h2>
+
       {/* --------------------------------------------------------------- */}
       {/* Background                                                      */}
       {/* --------------------------------------------------------------- */}
@@ -666,25 +1060,25 @@ export default function Footer() {
         ].join(" ")}
       />
 
-      <Container
-        className="relative"
-      >
+      <Container className="relative">
         {/* ------------------------------------------------------------- */}
-        {/* Premium Conversion CTA                                        */}
+        {/* Conversion CTA                                                */}
         {/* ------------------------------------------------------------- */}
 
         <section
           aria-labelledby="footer-campaign-heading"
           className={[
             "relative -mt-px overflow-hidden",
-            "rounded-b-[30px]",
+            "rounded-b-[24px]",
             "border-x border-b",
             "border-[rgba(227,179,77,0.18)]",
             "bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(211,154,46,0.05)_38%,rgba(8,8,9,0.94))]",
-            "px-6 py-10",
-            "shadow-[0_30px_100px_rgba(0,0,0,0.45)]",
-            "md:px-10 md:py-12",
-            "lg:px-14 lg:py-14",
+            "px-5 py-8",
+            "shadow-[0_24px_80px_rgba(0,0,0,0.4)]",
+            "sm:rounded-b-[28px]",
+            "sm:px-7 sm:py-9",
+            "lg:rounded-b-[30px]",
+            "lg:px-12 lg:py-12",
           ].join(" ")}
         >
           <div className="mr-card-topline" />
@@ -699,15 +1093,22 @@ export default function Footer() {
             className="pointer-events-none absolute -bottom-40 -left-24 h-80 w-80 rounded-full bg-[rgba(211,154,46,0.055)] blur-[110px]"
           />
 
-          <div className="relative grid gap-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div className="relative grid gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-10">
             <div className="max-w-3xl">
-              <p className="mr-eyebrow mb-4">
+              <p className="mr-eyebrow mb-3 sm:mb-4">
                 Your Next Move Starts Here
               </p>
 
               <h2
                 id="footer-campaign-heading"
-                className="m-0 text-balance text-3xl font-black leading-tight tracking-[-0.05em] text-[var(--mr-text)] sm:text-4xl lg:text-[2.8rem] lg:leading-[1.04]"
+                className={[
+                  "m-0 text-balance",
+                  "text-[1.8rem] font-black leading-[1.05]",
+                  "tracking-[-0.045em]",
+                  "text-[var(--mr-text)]",
+                  "sm:text-4xl",
+                  "lg:text-[2.65rem]",
+                ].join(" ")}
               >
                 Build the Record.{" "}
                 <span className="mr-text-gradient">
@@ -715,22 +1116,26 @@ export default function Footer() {
                 </span>
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/52 sm:text-base">
-                Explore platform-specific marketing, submit your music to the
-                label, or contact Money Records about distribution, artist
-                development, release strategy, and business opportunities.
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/48 sm:mt-5 sm:text-base">
+                Explore marketing, submit your music, or contact
+                Money Records about distribution, development,
+                release strategy, and opportunities.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-5 hidden flex-wrap gap-2 sm:flex">
                 {[
                   "Marketing",
                   "Distribution",
                   "Artist Development",
                   "Submissions",
                 ].map(
-                  (label) => (
+                  (
+                    label,
+                  ) => (
                     <span
-                      key={label}
+                      key={
+                        label
+                      }
                       className="inline-flex min-h-8 items-center rounded-full border border-[rgba(227,179,77,0.14)] bg-[rgba(211,154,46,0.035)] px-3 text-[8px] font-black uppercase tracking-[0.12em] text-[var(--mr-gold-200)]"
                     >
                       {label}
@@ -740,7 +1145,7 @@ export default function Footer() {
               </div>
             </div>
 
-            <div className="grid w-full gap-3 sm:grid-cols-2 lg:ml-auto lg:max-w-[460px]">
+            <div className="grid w-full gap-2.5 sm:grid-cols-2 lg:ml-auto lg:max-w-[460px]">
               <Button
                 variant="primary"
                 href="/services"
@@ -763,7 +1168,7 @@ export default function Footer() {
                 variant="ghost"
                 href="/distribution"
                 size="lg"
-                className="w-full"
+                className="hidden w-full sm:inline-flex"
               >
                 Distribution
               </Button>
@@ -772,7 +1177,7 @@ export default function Footer() {
                 variant="ghost"
                 href="/contact"
                 size="lg"
-                className="w-full"
+                className="hidden w-full sm:inline-flex"
               >
                 Contact the Team
               </Button>
@@ -781,18 +1186,18 @@ export default function Footer() {
         </section>
 
         {/* ------------------------------------------------------------- */}
-        {/* Quick Paths                                                   */}
+        {/* Desktop Quick Paths                                           */}
         {/* ------------------------------------------------------------- */}
 
         <section
           aria-label="Money Records quick links"
-          className="grid gap-3 py-8 sm:grid-cols-2 lg:grid-cols-4"
+          className="hidden gap-3 py-8 md:grid md:grid-cols-2 lg:grid-cols-4"
         >
           <QuickLink
             href="/artists"
             eyebrow="The Roster"
             title="Explore Artists"
-            description="Discover Money Records artist profiles, biographies, releases, and official links."
+            description="Artist profiles, biographies, releases, and official links."
             icon={
               <ArtistIcon />
             }
@@ -802,7 +1207,7 @@ export default function Footer() {
             href="/releases"
             eyebrow="The Catalog"
             title="Explore Releases"
-            description="Discover current releases, artwork, streaming links, and catalog information."
+            description="Current releases, artwork, streaming links, and catalog information."
             icon={
               <MusicIcon />
             }
@@ -822,128 +1227,221 @@ export default function Footer() {
             href="/services"
             eyebrow="Campaign Store"
             title="Music Marketing"
-            description="Explore platform-specific campaign options across streaming, social, video, and media."
+            description="Explore campaigns across streaming, social, video, and media."
             icon={
               <MegaphoneIcon />
             }
           />
         </section>
 
-        <Divider
-          className="mr-divider-soft"
-        />
+        <div className="hidden md:block">
+          <Divider
+            className="mr-divider-soft"
+          />
+        </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* Main Footer                                                   */}
+        {/* MOBILE FOOTER                                                 */}
         {/* ------------------------------------------------------------- */}
 
-        <div
-          className={[
-            "grid gap-12 py-14",
-            "md:grid-cols-2",
-            "lg:grid-cols-[1.35fr_0.72fr_0.72fr_0.72fr_1.05fr]",
-            "lg:gap-9 lg:py-18",
-          ].join(" ")}
-        >
-          {/* ----------------------------------------------------------- */}
-          {/* Brand                                                       */}
-          {/* ----------------------------------------------------------- */}
+        <div className="py-8 md:hidden">
+          {/* Brand */}
 
-          <div className="max-w-md">
-            <Link
-              href="/"
-              aria-label="Money Records homepage"
-              className="group inline-flex items-center gap-4"
+          <FooterBrand />
+
+          {/* Contact */}
+
+          <div className="mt-6">
+            <FooterContact />
+          </div>
+
+          {/* Accordions */}
+
+          <div className="mt-7 overflow-hidden rounded-[22px] border border-white/[0.065] bg-white/[0.018] px-4">
+            {footerGroups.map(
+              (
+                group,
+              ) => (
+                <MobileAccordion
+                  key={
+                    group.title
+                  }
+                  title={
+                    group.title
+                  }
+                >
+                  <nav
+                    aria-label={`${group.title} footer navigation`}
+                  >
+                    {group.links.map(
+                      (
+                        link,
+                      ) => (
+                        <MobileFooterLink
+                          key={`${group.title}-${link.label}`}
+                          link={
+                            link
+                          }
+                        />
+                      ),
+                    )}
+                  </nav>
+                </MobileAccordion>
+              ),
+            )}
+
+            <MobileAccordion
+              title="Campaign Platforms"
             >
-              <span className="mr-brand-mark relative h-14 w-14 overflow-hidden">
-                <Image
-                  src="/brand/mr-crest.png"
-                  alt=""
-                  width={64}
-                  height={64}
-                  sizes="64px"
-                  className={[
-                    "h-full w-full object-contain p-1.5",
-                    "transition-transform duration-500",
-                    "group-hover:scale-105",
-                  ].join(" ")}
-                />
+              <p className="mb-4 text-xs leading-6 text-white/36">
+                Marketing services across streaming, social,
+                video, press, radio, and artist branding.
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {platformLabels.map(
+                  (
+                    platform,
+                  ) => (
+                    <PlatformBadge
+                      key={
+                        platform
+                      }
+                    >
+                      {platform}
+                    </PlatformBadge>
+                  ),
+                )}
+              </div>
+
+              <Link
+                href="/services"
+                className={[
+                  "group mt-5 inline-flex min-h-10 items-center gap-2",
+                  "text-[9px] font-black uppercase tracking-[0.14em]",
+                  "text-[var(--mr-gold-200)]",
+                ].join(" ")}
+              >
+                Explore All Services
+
+                <ArrowIcon />
+              </Link>
+            </MobileAccordion>
+
+            <MobileAccordion
+              title="Customer Protection"
+            >
+              <nav aria-label="Customer protection">
+                {legalLinks.map(
+                  (
+                    link,
+                  ) => (
+                    <MobileFooterLink
+                      key={
+                        link.href
+                      }
+                      link={
+                        link
+                      }
+                    />
+                  ),
+                )}
+              </nav>
+            </MobileAccordion>
+          </div>
+
+          {/* Mobile campaign standard */}
+
+          <div className="mt-6 rounded-[20px] border border-[rgba(227,179,77,0.13)] bg-[rgba(211,154,46,0.025)] p-4">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 flex-[0_0_40px] place-items-center rounded-xl border border-[rgba(227,179,77,0.18)] bg-[rgba(211,154,46,0.045)] text-[var(--mr-gold-200)]">
+                <ShieldIcon />
               </span>
 
-              <span className="flex min-w-0 flex-col">
-                <span className="truncate text-base font-black uppercase tracking-[0.18em] text-[var(--mr-text)]">
-                  Money Records
-                </span>
+              <div className="min-w-0">
+                <p className="m-0 text-[8px] font-black uppercase tracking-[0.15em] text-[var(--mr-gold-200)]">
+                  Campaign Standards
+                </p>
 
-                <span className="mt-2 truncate text-[9px] font-bold uppercase tracking-[0.24em] text-white/38">
-                  Record Label · Global Marketing
-                </span>
-              </span>
-            </Link>
+                <p className="mt-2 text-[11px] leading-5 text-white/38">
+                  Marketing results can vary. Campaign estimates
+                  are not guaranteed streams, views, followers,
+                  placements, press, radio play, sales, or revenue.
+                </p>
 
-            <p className="mt-6 text-sm leading-7 text-white/50">
-              An independent record label and music company connecting artist
-              development, releases, distribution, platform marketing,
-              branding, press, video, radio, and release strategy.
+                <Link
+                  href="/marketing-disclaimer"
+                  className="mt-3 inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-[var(--mr-gold-200)]"
+                >
+                  Full Disclaimer
+
+                  <ArrowIcon />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile bottom */}
+
+          <div className="mt-7 border-t border-white/[0.06] pt-6">
+            <p className="m-0 text-[9px] uppercase leading-5 tracking-[0.12em] text-white/30">
+              © {currentYear} Money Records LLC.
+              All rights reserved.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.035] px-3 py-2 text-[8px] font-black uppercase tracking-[0.13em] text-emerald-300/75">
+            <p className="mt-2 text-[8px] uppercase leading-5 tracking-[0.11em] text-white/18">
+              Independent Record Label · Music Distribution ·
+              Global Marketing
+            </p>
+
+            <div className="mt-5 flex items-center justify-between gap-4">
+              <span className="inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.12em] text-white/24">
+                <ShieldIcon />
+                Secure · Transparent
+              </span>
+
+              <a
+                href="#top"
+                className="inline-flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-[var(--mr-gold-200)]"
+              >
+                Back to Top
+
                 <span
                   aria-hidden="true"
-                  className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.75)]"
-                />
-
-                Artist Submissions Open
-              </span>
-
-              <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(227,179,77,0.14)] bg-[rgba(211,154,46,0.035)] px-3 py-2 text-[8px] font-black uppercase tracking-[0.13em] text-[var(--mr-gold-200)]">
-                Independent Since 2019
-              </span>
+                  className="rotate-[-45deg]"
+                >
+                  <ArrowUpRightIcon />
+                </span>
+              </a>
             </div>
+          </div>
+        </div>
 
-            {/* Contact */}
+        {/* ------------------------------------------------------------- */}
+        {/* DESKTOP FOOTER                                                */}
+        {/* ------------------------------------------------------------- */}
 
-            <div className="mt-7 grid gap-3">
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className={[
-                  "group inline-flex w-fit items-center gap-3",
-                  "text-sm text-white/60",
-                  "transition-colors duration-200",
-                  "hover:text-[var(--mr-gold-100)]",
-                ].join(" ")}
-              >
-                <span className="mr-icon-ring h-9 w-9 flex-[0_0_36px]">
-                  <MailIcon />
-                </span>
+        <div className="hidden md:block">
+          {/* Main Footer */}
 
-                <span>
-                  {CONTACT_EMAIL}
-                </span>
-              </a>
+          <div
+            className={[
+              "grid gap-10 py-12",
+              "md:grid-cols-2",
+              "xl:grid-cols-[1.35fr_0.72fr_0.72fr_0.72fr_1.05fr]",
+              "xl:gap-9 xl:py-16",
+            ].join(" ")}
+          >
+            {/* Brand */}
 
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={[
-                  "group inline-flex w-fit items-center gap-3",
-                  "text-sm text-white/60",
-                  "transition-colors duration-200",
-                  "hover:text-[var(--mr-gold-100)]",
-                ].join(" ")}
-              >
-                <span className="mr-icon-ring h-9 w-9 flex-[0_0_36px]">
-                  <InstagramIcon />
-                </span>
+            <div className="max-w-md">
+              <FooterBrand />
 
-                <span>
-                  {INSTAGRAM_HANDLE}
-                </span>
-              </a>
+              <div className="mt-7 max-w-sm">
+                <FooterContact />
+              </div>
 
-              <div className="inline-flex w-fit items-center gap-3 text-sm text-white/50">
+              <div className="mt-5 inline-flex items-center gap-3 text-sm text-white/42">
                 <span className="mr-icon-ring h-9 w-9 flex-[0_0_36px]">
                   <GlobeIcon />
                 </span>
@@ -953,273 +1451,282 @@ export default function Footer() {
                 </span>
               </div>
             </div>
+
+            {/* Navigation groups */}
+
+            {footerGroups.map(
+              (
+                group,
+              ) => (
+                <nav
+                  key={
+                    group.title
+                  }
+                  aria-label={`${group.title} footer navigation`}
+                >
+                  <h3 className="m-0 text-[10px] font-black uppercase tracking-[0.19em] text-[var(--mr-gold-200)]">
+                    {group.title}
+                  </h3>
+
+                  <ul className="mt-6 grid list-none gap-4 p-0">
+                    {group.links.map(
+                      (
+                        link,
+                      ) => (
+                        <li
+                          key={`${group.title}-${link.label}`}
+                        >
+                          <FooterNavigationLink
+                            link={
+                              link
+                            }
+                          />
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                </nav>
+              ),
+            )}
+
+            {/* Campaign Platforms */}
+
+            <div>
+              <h3 className="m-0 text-[10px] font-black uppercase tracking-[0.19em] text-[var(--mr-gold-200)]">
+                Campaign Platforms
+              </h3>
+
+              <p className="mt-6 text-sm leading-7 text-white/42">
+                Browse marketing services built around the
+                platform, release, and campaign objective.
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {platformLabels.map(
+                  (
+                    platform,
+                  ) => (
+                    <PlatformBadge
+                      key={
+                        platform
+                      }
+                    >
+                      {platform}
+                    </PlatformBadge>
+                  ),
+                )}
+              </div>
+
+              <Link
+                href="/services"
+                className={[
+                  "group mt-6 inline-flex items-center gap-2",
+                  "text-[9px] font-black uppercase tracking-[0.14em]",
+                  "text-[var(--mr-gold-200)]",
+                  "transition hover:text-[var(--mr-gold-100)]",
+                ].join(" ")}
+              >
+                Explore All Services
+
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                  <ArrowIcon />
+                </span>
+              </Link>
+            </div>
           </div>
 
-          {/* ----------------------------------------------------------- */}
-          {/* Navigation Groups                                           */}
-          {/* ----------------------------------------------------------- */}
-
-          {footerGroups.map(
-            (group) => (
-              <nav
-                key={
-                  group.title
-                }
-                aria-label={`${group.title} footer navigation`}
-              >
-                <h3 className="m-0 text-[10px] font-black uppercase tracking-[0.19em] text-[var(--mr-gold-200)]">
-                  {group.title}
-                </h3>
-
-                <ul className="mt-6 grid list-none gap-4 p-0">
-                  {group.links.map(
-                    (link) => (
-                      <li
-                        key={`${group.title}-${link.label}`}
-                      >
-                        <FooterNavigationLink
-                          link={
-                            link
-                          }
-                        />
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </nav>
-            ),
-          )}
+          <Divider />
 
           {/* ----------------------------------------------------------- */}
-          {/* Campaign Platforms                                          */}
+          {/* Campaign Standards                                          */}
           {/* ----------------------------------------------------------- */}
 
-          <div>
-            <h3 className="m-0 text-[10px] font-black uppercase tracking-[0.19em] text-[var(--mr-gold-200)]">
-              Campaign Platforms
-            </h3>
+          <section
+            aria-labelledby="footer-standards-heading"
+            className="py-7"
+          >
+            <div
+              className={[
+                "relative overflow-hidden rounded-[24px]",
+                "border border-[rgba(227,179,77,0.15)]",
+                "bg-[linear-gradient(135deg,rgba(211,154,46,0.045),rgba(255,255,255,0.018))]",
+                "p-5 sm:p-6",
+              ].join(" ")}
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-[rgba(227,179,77,0.07)] blur-[85px]"
+              />
 
-            <p className="mt-6 text-sm leading-7 text-white/45">
-              Browse individual marketing services built around the platform,
-              release, and campaign objective.
-            </p>
+              <div className="relative grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+                <span className="grid h-12 w-12 place-items-center rounded-2xl border border-[rgba(227,179,77,0.2)] bg-[rgba(211,154,46,0.05)] text-[var(--mr-gold-200)]">
+                  <ShieldIcon />
+                </span>
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {platformLabels.map(
-                (platform) => (
-                  <PlatformBadge
-                    key={
-                      platform
-                    }
+                <div>
+                  <p
+                    id="footer-standards-heading"
+                    className="m-0 text-[9px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)]"
                   >
-                    {platform}
-                  </PlatformBadge>
+                    Money Records Campaign Standards
+                  </p>
+
+                  <p className="mt-2 max-w-4xl text-xs leading-6 text-white/42">
+                    Money Records does not represent campaign
+                    estimates as guaranteed streams, views,
+                    followers, playlist placements, press coverage,
+                    radio play, sales, revenue, or other specific
+                    outcomes. Results can vary by release, audience,
+                    targeting, creative assets, platform conditions,
+                    campaign scope, and other factors.
+                  </p>
+                </div>
+
+                <Link
+                  href="/marketing-disclaimer"
+                  className={[
+                    "group inline-flex min-h-10 w-fit items-center gap-2",
+                    "rounded-full",
+                    "border border-white/[0.075]",
+                    "bg-white/[0.025]",
+                    "px-4",
+                    "text-[8px] font-black uppercase tracking-[0.13em]",
+                    "text-white/48",
+                    "transition",
+                    "hover:border-[rgba(227,179,77,0.22)]",
+                    "hover:text-[var(--mr-gold-200)]",
+                  ].join(" ")}
+                >
+                  Full Disclaimer
+
+                  <ArrowIcon />
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          <Divider
+            className="mr-divider-soft"
+          />
+
+          {/* ----------------------------------------------------------- */}
+          {/* Legal Navigation                                            */}
+          {/* ----------------------------------------------------------- */}
+
+          <div className="grid gap-6 py-7 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+              <span className="text-[8px] font-black uppercase tracking-[0.16em] text-white/22">
+                Customer Protection
+              </span>
+
+              {legalLinks.map(
+                (
+                  link,
+                ) => (
+                  <Link
+                    key={
+                      link.href
+                    }
+                    href={
+                      link.href
+                    }
+                    className={[
+                      "text-[9px] font-bold uppercase tracking-[0.12em]",
+                      "text-white/38",
+                      "transition-colors duration-200",
+                      "hover:text-[var(--mr-gold-200)]",
+                    ].join(" ")}
+                  >
+                    {link.label}
+                  </Link>
                 ),
               )}
             </div>
 
-            <Link
-              href="/services"
-              className={[
-                "group mt-6 inline-flex items-center gap-2",
-                "text-[9px] font-black uppercase tracking-[0.14em]",
-                "text-[var(--mr-gold-200)]",
-                "transition hover:text-[var(--mr-gold-100)]",
-              ].join(" ")}
-            >
-              Explore All Services
+            <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-white/24">
+              <ShieldIcon />
 
-              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-                <ArrowIcon />
-              </span>
-            </Link>
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* ------------------------------------------------------------- */}
-        {/* Trust / Campaign Standards                                    */}
-        {/* ------------------------------------------------------------- */}
-
-        <section
-          aria-labelledby="footer-standards-heading"
-          className="py-8"
-        >
-          <div
-            className={[
-              "relative overflow-hidden rounded-[24px]",
-              "border border-[rgba(227,179,77,0.15)]",
-              "bg-[linear-gradient(135deg,rgba(211,154,46,0.045),rgba(255,255,255,0.018))]",
-              "p-5 sm:p-6",
-            ].join(" ")}
-          >
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-[rgba(227,179,77,0.07)] blur-[85px]"
-            />
-
-            <div className="relative grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl border border-[rgba(227,179,77,0.2)] bg-[rgba(211,154,46,0.05)] text-[var(--mr-gold-200)]">
-                <ShieldIcon />
-              </span>
-
-              <div>
-                <p
-                  id="footer-standards-heading"
-                  className="m-0 text-[9px] font-black uppercase tracking-[0.16em] text-[var(--mr-gold-200)]"
-                >
-                  Money Records Campaign Standards
-                </p>
-
-                <p className="mt-2 max-w-4xl text-xs leading-6 text-white/42">
-                  Money Records does not represent campaign estimates as
-                  guaranteed streams, views, followers, playlist placements,
-                  press coverage, radio play, sales, revenue, or other specific
-                  outcomes. Results can vary by release, audience, targeting,
-                  creative assets, platform conditions, campaign scope, and
-                  other factors.
-                </p>
-              </div>
-
-              <Link
-                href="/marketing-disclaimer"
-                className={[
-                  "group inline-flex min-h-10 w-fit items-center gap-2",
-                  "rounded-full border border-white/[0.075]",
-                  "bg-white/[0.025] px-4",
-                  "text-[8px] font-black uppercase tracking-[0.13em]",
-                  "text-white/48",
-                  "transition",
-                  "hover:border-[rgba(227,179,77,0.22)]",
-                  "hover:text-[var(--mr-gold-200)]",
-                ].join(" ")}
-              >
-                Full Disclaimer
-
-                <ArrowIcon />
-              </Link>
+              Secure · Transparent · Artist Focused
             </div>
           </div>
-        </section>
 
-        <Divider
-          className="mr-divider-soft"
-        />
+          <Divider
+            className="mr-divider-soft"
+          />
 
-        {/* ------------------------------------------------------------- */}
-        {/* Legal Navigation                                              */}
-        {/* ------------------------------------------------------------- */}
+          {/* ----------------------------------------------------------- */}
+          {/* Desktop Bottom Bar                                          */}
+          {/* ----------------------------------------------------------- */}
 
-        <div className="grid gap-6 py-7 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-            <span className="text-[8px] font-black uppercase tracking-[0.16em] text-white/22">
-              Customer Protection
-            </span>
-
-            {legalLinks.map(
-              (link) => (
-                <Link
-                  key={
-                    link.href
-                  }
-                  href={
-                    link.href
-                  }
-                  className={[
-                    "text-[9px] font-bold uppercase tracking-[0.12em]",
-                    "text-white/38",
-                    "transition-colors duration-200",
-                    "hover:text-[var(--mr-gold-200)]",
-                  ].join(" ")}
-                >
-                  {link.label}
-                </Link>
-              ),
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.13em] text-white/24">
-            <ShieldIcon />
-
-            Secure · Transparent · Artist Focused
-          </div>
-        </div>
-
-        <Divider
-          className="mr-divider-soft"
-        />
-
-        {/* ------------------------------------------------------------- */}
-        {/* Bottom Bar                                                    */}
-        {/* ------------------------------------------------------------- */}
-
-        <div
-          className={[
-            "flex flex-col gap-6 py-8",
-            "text-xs text-white/35",
-            "lg:flex-row lg:items-center lg:justify-between",
-          ].join(" ")}
-        >
-          <div>
-            <p className="m-0 uppercase tracking-[0.14em]">
-              © {currentYear} Money Records LLC. All rights reserved.
-            </p>
-
-            <p className="mt-2 text-[9px] uppercase tracking-[0.12em] text-white/22">
-              Independent Record Label · Music Distribution · Global Marketing
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
-              <CheckIcon />
-              Artist Development
-            </span>
-
-            <span
-              aria-hidden="true"
-              className="hidden text-white/12 sm:inline"
-            >
-              •
-            </span>
-
-            <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
-              <CheckIcon />
-              Music Marketing
-            </span>
-
-            <span
-              aria-hidden="true"
-              className="hidden text-white/12 sm:inline"
-            >
-              •
-            </span>
-
-            <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
-              <CheckIcon />
-              Distribution
-            </span>
-          </div>
-
-          <a
-            href="#top"
+          <div
             className={[
-              "group inline-flex w-fit items-center gap-2",
-              "uppercase tracking-[0.14em]",
-              "transition-colors duration-200",
-              "hover:text-[var(--mr-gold-100)]",
+              "flex flex-col gap-6 py-8",
+              "text-xs text-white/35",
+              "lg:flex-row lg:items-center lg:justify-between",
             ].join(" ")}
           >
-            Back to Top
+            <div>
+              <p className="m-0 uppercase tracking-[0.14em]">
+                © {currentYear} Money Records LLC.
+                All rights reserved.
+              </p>
 
-            <span
-              aria-hidden="true"
-              className="rotate-[-45deg] transition-transform duration-200 group-hover:-translate-y-0.5"
+              <p className="mt-2 text-[9px] uppercase tracking-[0.12em] text-white/22">
+                Independent Record Label · Music Distribution ·
+                Global Marketing
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
+                <CheckIcon />
+                Artist Development
+              </span>
+
+              <span
+                aria-hidden="true"
+                className="hidden text-white/12 sm:inline"
+              >
+                •
+              </span>
+
+              <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
+                <CheckIcon />
+                Music Marketing
+              </span>
+
+              <span
+                aria-hidden="true"
+                className="hidden text-white/12 sm:inline"
+              >
+                •
+              </span>
+
+              <span className="inline-flex items-center gap-2 uppercase tracking-[0.13em]">
+                <CheckIcon />
+                Distribution
+              </span>
+            </div>
+
+            <a
+              href="#top"
+              className={[
+                "group inline-flex w-fit items-center gap-2",
+                "uppercase tracking-[0.14em]",
+                "transition-colors duration-200",
+                "hover:text-[var(--mr-gold-100)]",
+              ].join(" ")}
             >
-              <ArrowUpRightIcon />
-            </span>
-          </a>
+              Back to Top
+
+              <span
+                aria-hidden="true"
+                className="rotate-[-45deg] transition-transform duration-200 group-hover:-translate-y-0.5"
+              >
+                <ArrowUpRightIcon />
+              </span>
+            </a>
+          </div>
         </div>
       </Container>
     </footer>
